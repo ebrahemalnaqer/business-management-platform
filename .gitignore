@@ -1,0 +1,12 @@
+# Local/editor files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Secrets / local configuration
+.env
+*.env
+secrets/
+
+# Google Apps Script local files
+.claspignore

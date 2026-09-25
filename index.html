@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Techno Club</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+/* ── DESIGN SYSTEM: MINT GREEN THEME ── */
+:root {
+  --bg: #f0f7f4;
+  --surface: #ffffff;
+  --surface2: #f4faf7;
+  --border: #d1ede4;
+  --text: #0f2b20;
+  --text2: #4a6b5c;
+  --accent: #12b981;
+  --accent-dark: #0d9668;
+  --accent-light: rgba(18,185,129,0.12);
+  --accent2: #059669;
+  --success: #12b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --sidebar-bg: #071c14;
+  --sidebar-text: #6b9e84;
+  --sidebar-active: #12b981;
+}
+body.dark {
+  --bg: #071c14;
+  --surface: #0d2b1e;
+  --surface2: #0a2218;
+  --border: #1a4030;
+  --text: #e8faf3;
+  --text2: #6b9e84;
+  --sidebar-bg: #040f0a;
+  --sidebar-text: #4a6b5c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;min-height:100vh;}
+h1,h2,h3,h4,h5{font-family:'Syne',sans-serif;}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;top:0;left:0;width:240px;height:100vh;
+  background:var(--sidebar-bg);display:flex;flex-direction:column;
+  z-index:50;transition:transform .3s,background .3s;overflow-y:auto;
+}
+body[dir="rtl"] #sidebar{left:auto;right:0;}
+.sidebar-logo{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,.05);}
+.sidebar-logo h1{color:#fff;font-size:1.25rem;font-weight:800;letter-spacing:-.02em;}
+.sidebar-logo h1 span{color:var(--accent);}
+.sidebar-logo p{color:#2d6b4a;font-size:.68rem;margin-top:2px;letter-spacing:.04em;}
+.nav-section{padding:12px 10px 4px;}
+.nav-section-label{color:#1a4a2e;font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:0 8px;margin-bottom:4px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+  color:var(--sidebar-text);font-size:.82rem;font-weight:500;cursor:pointer;
+  transition:all .18s;margin-bottom:2px;user-select:none;border:1px solid transparent;
+}
+.nav-item i{width:16px;text-align:center;font-size:.8rem;}
+.nav-item:hover{background:rgba(18,185,129,.1);color:#6effd8;}
+.nav-item.active{background:rgba(18,185,129,.18);color:#a7f3d0;border-color:rgba(18,185,129,.28);}
+.nav-item .nbadge{margin-left:auto;background:var(--danger);color:#fff;font-size:.58rem;padding:2px 6px;border-radius:10px;font-weight:700;}
+body[dir="rtl"] .nav-item .nbadge{margin-left:0;margin-right:auto;}
+
+/* MAIN */
+#main{margin-left:240px;min-height:100vh;transition:margin .3s;}
+body[dir="rtl"] #main{margin-left:0;margin-right:240px;}
+
+/* TOPBAR */
+#topbar{
+  position:sticky;top:0;z-index:40;background:var(--surface);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;
+  justify-content:space-between;padding:0 24px;height:60px;
+  transition:background .3s,border .3s;
+}
+.topbar-title{font-size:.95rem;font-weight:700;color:var(--text);}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.toggle-btn{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;
+  cursor:pointer;border:1px solid var(--border);font-size:.73rem;font-weight:600;
+  background:var(--surface2);color:var(--text2);transition:all .2s;user-select:none;
+}
+.toggle-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* PAGES */
+.page{display:none;padding:24px;}
+.page.active{display:block;}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:22px;}
+.kpi-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;transition:all .2s;position:relative;overflow:hidden;
+}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.kpi-card .kpi-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.95rem;margin-bottom:10px;}
+.kpi-card .kpi-value{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--text);line-height:1;transition:all .4s;}
+.kpi-card .kpi-label{font-size:.7rem;color:var(--text2);margin-top:4px;font-weight:500;}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:900px){.chart-grid{grid-template-columns:1fr;}}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.chart-card h3{font-size:.83rem;font-weight:700;color:var(--text);margin-bottom:14px;}
+.chart-wrapper{position:relative;height:210px;}
+
+/* TABLES */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.table-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+.table-card-header h3{font-size:.86rem;font-weight:700;color:var(--text);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.79rem;}
+thead th{
+  background:var(--surface2);color:var(--text2);font-size:.65rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;padding:9px 14px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+body[dir="rtl"] thead th{text-align:right;}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+tbody tr.row-new{animation:rowSlideIn .35s ease;}
+@keyframes rowSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+/* BADGES */
+.badge-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:.63rem;font-weight:700;letter-spacing:.03em;}
+.badge-green{background:rgba(18,185,129,.12);color:#12b981;}
+.badge-red{background:rgba(239,68,68,.12);color:#ef4444;}
+.badge-yellow{background:rgba(245,158,11,.12);color:#f59e0b;}
+.badge-blue{background:rgba(59,130,246,.12);color:#3b82f6;}
+.badge-gray{background:rgba(100,116,139,.12);color:#64748b;}
+.badge-mint{background:rgba(18,185,129,.15);color:#059669;}
+
+/* BUTTONS — Mint Primary */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;
+  font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .18s;
+  font-family:'DM Sans',sans-serif;white-space:nowrap;
+}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(18,185,129,.35);}
+.btn-success{background:#12b981;color:#fff;}
+.btn-success:hover{background:#0d9668;box-shadow:0 4px 12px rgba(18,185,129,.35);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{background:#dc2626;}
+.btn-warning{background:var(--warning);color:#fff;}
+.btn-warning:hover{background:#d97706;}
+.btn-info{background:var(--info);color:#fff;}
+.btn-info:hover{background:#2563eb;}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+.btn-sm{padding:5px 10px;font-size:.72rem;}
+.btn-xs{padding:3px 8px;font-size:.68rem;}
+
+/* FORMS */
+.form-group{margin-bottom:13px;}
+.form-label{display:block;font-size:.73rem;font-weight:600;color:var(--text2);margin-bottom:5px;}
+.form-input,.form-select,.form-textarea{
+  width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--surface);color:var(--text);font-size:.81rem;font-family:'DM Sans',sans-serif;
+  transition:border-color .18s,box-shadow .18s;outline:none;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--accent);box-shadow:0 0 0 3px rgba(18,185,129,.12);
+}
+.form-input.input-error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
+.form-input.input-success{border-color:var(--accent);background:rgba(18,185,129,.03);}
+.form-textarea{resize:vertical;min-height:78px;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field-hint{font-size:.65rem;color:var(--text2);margin-top:3px;}
+.field-error{font-size:.65rem;color:var(--danger);margin-top:3px;display:none;}
+.field-error.show{display:block;}
+
+/* AUTOCOMPLETE DROPDOWN */
+.autocomplete-wrap{position:relative;}
+.autocomplete-list{
+  position:absolute;top:calc(100% + 2px);left:0;right:0;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  max-height:180px;overflow-y:auto;z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.14);display:none;
+}
+.autocomplete-list.open{display:block;}
+.autocomplete-item{
+  padding:9px 14px;cursor:pointer;font-size:.8rem;color:var(--text);
+  border-bottom:1px solid var(--border);transition:background .12s;
+}
+.autocomplete-item:last-child{border-bottom:none;}
+.autocomplete-item:hover{background:var(--accent-light);color:var(--accent-dark);}
+.autocomplete-item .match-phone{color:var(--accent);font-weight:700;}
+.autocomplete-item .match-name{color:var(--text2);font-size:.72rem;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:540px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 25px 60px rgba(0,0,0,.28);animation:modalIn .22s ease;
+}
+.modal-box.wide{max-width:720px;}
+@keyframes modalIn{from{transform:scale(.95) translateY(10px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
+.modal-header h3{font-size:.97rem;font-weight:700;}
+.modal-body{padding:22px;}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--border);}
+
+/* RECEIPT/INVOICE MODAL — hidden by default, mounted via class only */
+#invoiceModal{display:none;}
+#invoiceModal.open{display:flex;}
+
+/* POS */
+.pos-layout{display:grid;grid-template-columns:1fr 330px;gap:14px;}
+@media(max-width:960px){.pos-layout{grid-template-columns:1fr;}}
+.pos-cart{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;height:610px;}
+.cart-items{flex:1;overflow-y:auto;padding:10px;}
+.cart-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:7px;background:var(--surface2);}
+.cart-item.highlight{animation:highlightRow .6s ease;border-color:var(--accent);}
+@keyframes highlightRow{0%,100%{background:var(--surface2);}50%{background:rgba(18,185,129,.12);}}
+.cart-item-info{flex:1;}
+.cart-item-name{font-size:.79rem;font-weight:600;color:var(--text);}
+.cart-item-price{font-size:.71rem;color:var(--text2);}
+.cart-qty-ctrl{display:flex;align-items:center;gap:5px;}
+.qty-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+.qty-btn:hover{border-color:var(--accent);color:var(--accent);}
+.cart-total-section{padding:14px;border-top:1px solid var(--border);}
+.cart-total-row{display:flex;justify-content:space-between;font-size:.78rem;color:var(--text2);margin-bottom:4px;}
+.cart-total-row.grand{font-size:.98rem;font-weight:800;color:var(--text);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px;}
+.svc-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 10px;cursor:pointer;text-align:center;transition:all .18s;user-select:none;}
+.svc-tile:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 14px rgba(18,185,129,.18);}
+.svc-tile .svc-icon{font-size:1.3rem;margin-bottom:5px;}
+.svc-tile .svc-name{font-size:.7rem;font-weight:700;color:var(--text);}
+.svc-tile .svc-price{font-size:.69rem;color:var(--accent);font-weight:600;margin-top:2px;}
+
+/* SESSION CARDS */
+.session-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:border-color .2s;}
+.session-card:hover{border-color:var(--accent);}
+.session-avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Syne',sans-serif;font-size:.95rem;flex-shrink:0;}
+.session-info{flex:1;}
+.session-name{font-size:.83rem;font-weight:700;color:var(--text);}
+.session-meta{font-size:.7rem;color:var(--text2);margin-top:2px;}
+.session-timer{font-family:'Syne',monospace;font-size:.86rem;font-weight:700;color:var(--accent);}
+
+/* LEDGER */
+.ledger-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:900px){.ledger-layout{grid-template-columns:1fr;}}
+
+/* SHIFT AUTO-FILL */
+.field-computed{background:rgba(18,185,129,.06);border-color:var(--accent) !important;color:var(--accent-dark) !important;font-weight:700;}
+
+/* TOAST */
+#toast-container{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
+body[dir="rtl"] #toast-container{right:auto;left:22px;}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 15px;min-width:230px;box-shadow:0 8px 24px rgba(0,0,0,.14);display:flex;align-items:center;gap:10px;font-size:.78rem;animation:toastIn .25s ease;color:var(--text);}
+@keyframes toastIn{from{transform:translateX(110%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.toast .ti{font-size:1rem;}
+.toast.success .ti{color:var(--success);}
+.toast.error .ti{color:var(--danger);}
+.toast.info .ti{color:var(--info);}
+.toast.warning .ti{color:var(--warning);}
+
+/* STAR RATING */
+.star-rating{display:flex;gap:4px;}
+.star-rating .star{font-size:1.1rem;cursor:pointer;color:#d1d5db;transition:color .12s;}
+.star-rating .star.active,.star-rating .star:hover{color:#f59e0b;}
+
+/* SPINNER */
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:36px 20px;color:var(--text2);}
+.empty-state i{font-size:2.2rem;margin-bottom:10px;opacity:.3;display:block;}
+.empty-state p{font-size:.82rem;}
+
+/* PRINT */
+@media print{body>*:not(#invoiceModal){display:none!important;}#invoiceModal{display:block!important;position:static!important;background:none!important;}.modal-footer,.modal-close{display:none!important;}}
+
+/* SMOOTH KPI TRANSITION */
+.kpi-value-updating{animation:kpiPulse .5s ease;}
+@keyframes kpiPulse{0%{transform:scale(1);}50%{transform:scale(1.08);color:var(--accent);}100%{transform:scale(1);}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h1>Techno<span>Club</span></h1>
+    <p data-i18n="tagline">ENTERPRISE CO-WORKING SAAS</p>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label" data-i18n="nav_overview">Overview</div>
+    <div class="nav-item active" data-page="dashboard"><i class="fa fa-gauge-high"></i><span data-i18n="nav_dashboard">Dashboard</span></div>
+    <div class="nav-item" data-page="checkin"><i class="fa fa-arrow-right-to-bracket"></i><span data-i18n="nav_checkin">Check-In / Out</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label" data-i18n="nav_operations">Operations</div>
+    <div class="nav-item" data-page="pos"><i class="fa fa-cash-register"></i><span data-i18n="nav_pos">Point of Sale</span></div>
+    <div class="nav-item" data-page="invoices"><i class="fa fa-file-invoice"></i><span data-i18n="nav_invoices">Invoices</span></div>
+    <div class="nav-item" data-page="clients"><i class="fa fa-users"></i><span data-i18n="nav_clients">Clients / CRM</span></div>
+    <div class="nav-item" data-page="services"><i class="fa fa-grid-2"></i><span data-i18n="nav_services">Services & Stock</span></div>
+    <div class="nav-item" data-page="roombookings"><i class="fa fa-calendar-check"></i><span data-i18n="nav_roombookings">Room Bookings</span></div>
+    <div class="nav-item" data-page="roomreports"><i class="fa fa-chart-column"></i><span data-i18n="nav_roomreports">Room Reports</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label" data-i18n="nav_finance">Finance</div>
+    <div class="nav-item" data-page="ledger"><i class="fa fa-book-open"></i><span data-i18n="nav_ledger">Financial Ledger</span></div>
+    <div class="nav-item" data-page="shifts"><i class="fa fa-clock-rotate-left"></i><span data-i18n="nav_shifts">Shift Reports</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label" data-i18n="nav_engagement">Engagement</div>
+    <div class="nav-item" data-page="feedback"><i class="fa fa-star"></i><span data-i18n="nav_feedback">Feedback</span><span class="nbadge" id="newFeedbackBadge" style="display:none">0</span></div>
+    <div class="nav-item" data-page="followups"><i class="fa fa-phone-volume"></i><span data-i18n="nav_followups">Follow Ups</span></div>
+  </div>
+  <div style="padding:14px 10px;margin-top:auto;">
+    <div class="nav-item" onclick="runDemoData()" style="background:rgba(18,185,129,.08);border:1px dashed rgba(18,185,129,.3);">
+      <i class="fa fa-database"></i><span data-i18n="load_demo">Load Demo Data</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div id="main">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-actions">
+      <div class="toggle-btn" onclick="toggleLang()" id="langToggle"><i class="fa fa-language"></i><span id="langLabel">العربية</span></div>
+      <div class="toggle-btn" onclick="toggleDark()"><i class="fa fa-moon" id="darkIcon"></i><span id="darkLabel">Dark</span></div>
+      <div class="toggle-btn" onclick="refreshPage()"><i class="fa fa-rotate-right"></i></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: DASHBOARD                                       -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-icon" style="background:var(--accent-light);color:var(--accent)"><i class="fa fa-users"></i></div><div class="kpi-value" id="kpi-clients">—</div><div class="kpi-label" data-i18n="kpi_total_clients">Total Clients</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(59,130,246,.1);color:#3b82f6"><i class="fa fa-door-open"></i></div><div class="kpi-value" id="kpi-sessions">—</div><div class="kpi-label" data-i18n="kpi_active_sessions">Active Sessions</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fa fa-money-bill-wave"></i></div><div class="kpi-value" id="kpi-gross">—</div><div class="kpi-label" data-i18n="kpi_gross_income">Gross Income (EGP)</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fa fa-chart-line"></i></div><div class="kpi-value" id="kpi-net">—</div><div class="kpi-label" data-i18n="kpi_net_yield">Net Yield (EGP)</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fa fa-triangle-exclamation"></i></div><div class="kpi-value" id="kpi-alerts">—</div><div class="kpi-label" data-i18n="kpi_low_stock">Low Stock Alerts</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(251,191,36,.1);color:#fbbf24"><i class="fa fa-star"></i></div><div class="kpi-value" id="kpi-rating">—</div><div class="kpi-label" data-i18n="kpi_avg_rating">Avg. Feedback Score</div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><h3 data-i18n="chart_revenue_7">Revenue — Last 7 Days (EGP)</h3><div class="chart-wrapper"><canvas id="revenueChart"></canvas></div></div>
+      <div class="chart-card"><h3 data-i18n="chart_expense_cat">Expenses by Category</h3><div class="chart-wrapper"><canvas id="expenseChart"></canvas></div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card"><h3 data-i18n="chart_monthly">This Month Summary (EGP)</h3><div class="chart-wrapper"><canvas id="monthlyChart"></canvas></div></div>
+      <div class="table-card" style="margin-bottom:0">
+        <div class="table-card-header"><h3 data-i18n="active_sessions_title">Active Sessions</h3><button class="btn btn-outline btn-sm" onclick="loadDashActiveSessions()"><i class="fa fa-rotate-right"></i></button></div>
+        <div style="padding:10px;max-height:270px;overflow-y:auto;" id="dashSessionList"><div class="empty-state"><i class="fa fa-door-open"></i><p>No active sessions</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: CHECK-IN / OUT                                  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-checkin">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="table-card">
+        <div class="table-card-header"><h3><i class="fa fa-arrow-right-to-bracket" style="color:var(--accent);margin-right:6px"></i><span data-i18n="checkin_title">Check-In</span></h3></div>
+        <div style="padding:20px;">
+
+          <!-- PHONE AUTOCOMPLETE — Primary UID -->
+          <div class="form-group">
+            <label class="form-label">Phone Number <span style="color:var(--accent);font-size:.65rem">(Primary ID)</span></label>
+            <div class="autocomplete-wrap">
+              <input class="form-input" id="checkin-phone" type="tel" placeholder="01xxxxxxxxx — type to search…" autocomplete="off" oninput="handlePhoneAutocomplete(this.value)"/>
+              <div class="autocomplete-list" id="phoneAutocompleteList"></div>
+            </div>
+            <div class="field-error" id="phone-ci-error">Phone not found. Register this client first.</div>
+          </div>
+
+          <!-- Auto-filled name -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="customer_name">Customer Name</label>
+            <input class="form-input" id="checkin-name" type="text" placeholder="Auto-filled or enter walk-in name" readonly/>
+            <div class="field-hint">Walks-ins: unlock <a href="#" onclick="toggleWalkinName();return false;" style="color:var(--accent);font-size:.65rem">manual entry</a></div>
+          </div>
+          <input type="hidden" id="checkin-clientid"/>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="select_resource">Select Resource / Workspace</label>
+            <select class="form-select" id="checkin-resource">
+              <option value="">— Select Resource —</option>
+            </select>
+          </div>
+          <button class="btn btn-success" style="width:100%;justify-content:center;margin-top:4px" onclick="doCheckIn()">
+            <i class="fa fa-arrow-right-to-bracket"></i><span data-i18n="btn_checkin"> Check In Now</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3><i class="fa fa-clock" style="color:var(--accent);margin-right:6px"></i><span>Active Sessions</span></h3>
+          <button class="btn btn-outline btn-sm" onclick="loadActiveSessions()"><i class="fa fa-rotate-right"></i></button>
+        </div>
+        <div style="padding:10px;max-height:510px;overflow-y:auto;" id="activeSessionsList">
+          <div class="empty-state"><i class="fa fa-door-open"></i><p>No active sessions</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: POS                                             -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-pos">
+    <!-- Session-injected notice banner -->
+    <div id="posSessionBanner" style="display:none;background:rgba(18,185,129,.1);border:1px solid rgba(18,185,129,.3);border-radius:10px;padding:10px 16px;margin-bottom:12px;font-size:.8rem;color:var(--accent-dark);display:none;">
+      <i class="fa fa-circle-check" style="margin-right:6px"></i>
+      <span id="posSessionBannerText"></span>
+    </div>
+
+    <div class="pos-layout">
+      <!-- CATALOG -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <h3 style="font-size:.86rem;font-weight:700" data-i18n="service_catalog">Service Catalog</h3>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;" id="catFilterBtns">
+            <button class="btn btn-primary btn-sm cat-btn" data-cat="all">All</button>
+            <button class="btn btn-outline btn-sm cat-btn" data-cat="Workspace">Workspace</button>
+            <button class="btn btn-outline btn-sm cat-btn" data-cat="Service">Services</button>
+            <button class="btn btn-outline btn-sm cat-btn" data-cat="Cafe">Café</button>
+            <button class="btn btn-outline btn-sm cat-btn" data-cat="Training">Training</button>
+          </div>
+        </div>
+        <div class="svc-grid" id="serviceCatalog"><div class="empty-state"><i class="fa fa-grid-2"></i><p>Loading…</p></div></div>
+      </div>
+
+      <!-- CART -->
+      <div class="pos-cart">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h3 style="font-size:.86rem;font-weight:700"><i class="fa fa-cart-shopping" style="margin-right:6px;color:var(--accent)"></i>Cart</h3>
+          <button class="btn btn-outline btn-xs" onclick="clearCart()"><i class="fa fa-trash"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems"><div class="empty-state" style="padding:28px 0"><i class="fa fa-cart-shopping"></i><p>Cart is empty</p></div></div>
+        <div class="cart-total-section">
+          <div class="form-group" style="margin-bottom:9px">
+            <label class="form-label">Customer</label>
+            <select class="form-select" id="pos-customer" style="font-size:.77rem;padding:7px 10px">
+              <option value="">Walk-in</option>
+            </select>
+          </div>
+          <div class="form-grid-2" style="gap:7px;margin-bottom:9px">
+            <div>
+              <label class="form-label">Discount (EGP)</label>
+              <input class="form-input" id="pos-discount" type="number" value="0" min="0" style="font-size:.77rem;padding:7px" oninput="updateCartTotal()"/>
+            </div>
+            <div>
+              <label class="form-label">Payment</label>
+              <select class="form-select" id="pos-payment" style="font-size:.77rem;padding:7px 10px">
+                <option>Cash</option><option>Card</option><option>Bank Transfer</option><option>Instapay</option><option>Vodafone Cash</option>
+              </select>
+            </div>
+          </div>
+          <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">0.00 EGP</span></div>
+          <div class="cart-total-row"><span>Discount</span><span id="cart-discount">0.00 EGP</span></div>
+          <div class="cart-total-row grand"><span>TOTAL</span><span id="cart-total" style="color:var(--accent)">0.00 EGP</span></div>
+          <button class="btn btn-success" style="width:100%;margin-top:10px;justify-content:center" onclick="checkoutPOS()">
+            <i class="fa fa-check"></i> Checkout &amp; Print
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: INVOICES                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-invoices">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3>All Invoices</h3>
+        <input class="form-input" id="invoiceSearch" style="max-width:230px;font-size:.77rem;padding:6px 10px" type="text" placeholder="Search invoices…" oninput="filterInvoices()"/>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Invoice ID</th><th>Date</th><th>Customer</th><th>Total</th>
+            <th>Payment</th><th>B2B Tab</th><th>Staff</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="invoiceTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: CLIENTS                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-clients">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3>Client Directory</h3>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="clientSearch" style="max-width:200px;font-size:.77rem;padding:6px 10px" type="text" placeholder="Search clients…" oninput="filterClients()"/>
+          <button class="btn btn-primary btn-sm" onclick="openAddClientModal()"><i class="fa fa-plus"></i> Add Client</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Phone (ID)</th><th>Name</th><th>Lead Source</th><th>Account Type</th><th>Hour Balance</th><th>Joined</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="clientTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: SERVICES                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-services">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3>Services &amp; Inventory</h3>
+        <button class="btn btn-primary btn-sm" onclick="openAddServiceModal()"><i class="fa fa-plus"></i> Add Service</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Service Name</th><th>Category</th><th>Cost</th><th>Price</th><th>Stock / Cap</th><th>Min Alert</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="serviceTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: FINANCIAL LEDGER                                -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-ledger">
+    <!-- KPI SUMMARY -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(175px,1fr));margin-bottom:18px">
+      <div class="kpi-card"><div class="kpi-icon" style="background:var(--accent-light);color:var(--accent)"><i class="fa fa-cash-register"></i></div><div class="kpi-value" id="led-pos">—</div><div class="kpi-label">POS Revenue</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fa fa-arrow-down"></i></div><div class="kpi-value" id="led-inflows">—</div><div class="kpi-label">Manual Inflows</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6"><i class="fa fa-coins"></i></div><div class="kpi-value" id="led-gross">—</div><div class="kpi-label">Gross Income</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fa fa-arrow-up-from-bracket"></i></div><div class="kpi-value" id="led-expenses">—</div><div class="kpi-label">Total Expenses</div></div>
+      <div class="kpi-card"><div class="kpi-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fa fa-chart-line"></i></div><div class="kpi-value" id="led-net">—</div><div class="kpi-label">Net Yield</div></div>
+    </div>
+    <div class="ledger-layout">
+      <!-- EXPENSES -->
+      <div>
+        <div class="table-card">
+          <div class="table-card-header">
+            <h3><i class="fa fa-arrow-up-from-bracket" style="color:var(--danger);margin-right:6px"></i>Expenses</h3>
+            <button class="btn btn-danger btn-sm" onclick="openAddExpenseModal()"><i class="fa fa-plus"></i> Add</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead>
+              <tbody id="expenseTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- MANUAL INFLOWS -->
+      <div>
+        <div class="table-card">
+          <div class="table-card-header">
+            <h3><i class="fa fa-arrow-down" style="color:var(--accent);margin-right:6px"></i>Manual Inflows</h3>
+            <button class="btn btn-success btn-sm" onclick="openAddInflowModal()"><i class="fa fa-plus"></i> Add</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead>
+              <tbody id="inflowTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: SHIFTS                                          -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-shifts">
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:14px">
+      <div class="table-card" style="height:fit-content">
+        <div class="table-card-header"><h3>Log Shift</h3></div>
+        <div style="padding:18px">
+          <div class="form-group">
+            <label class="form-label">Staff Name</label>
+            <input class="form-input" id="shift-staff" type="text"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input class="form-input" id="shift-date" type="date" onchange="autoComputeCashExpected(this.value)"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cash Expected (Auto-Calculated) <i class="fa fa-lock" style="font-size:.65rem;color:var(--accent)"></i></label>
+            <input class="form-input field-computed" id="shift-expected" type="number" readonly placeholder="Select date to compute…"/>
+            <div class="field-hint" id="shift-expected-breakdown" style="font-size:.64rem;color:var(--text2);margin-top:3px;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cash Reported (EGP)</label>
+            <input class="form-input" id="shift-reported" type="number" min="0"/>
+          </div>
+          <button class="btn btn-success" style="width:100%;justify-content:center" onclick="logShift()"><i class="fa fa-save"></i> Log Shift</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><h3>Shift History</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Staff</th><th>Expected</th><th>Reported</th><th>Variance</th><th>Status</th></tr></thead>
+            <tbody id="shiftTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: FEEDBACK                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-feedback">
+    <div style="display:grid;grid-template-columns:330px 1fr;gap:14px">
+      <div class="table-card" style="height:fit-content">
+        <div class="table-card-header"><h3>Leave Feedback</h3></div>
+        <div style="padding:18px">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input class="form-input" id="fb-name" type="text"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rating</label>
+            <div class="star-rating" id="starRating">
+              <span class="star active" data-val="1">★</span>
+              <span class="star active" data-val="2">★</span>
+              <span class="star active" data-val="3">★</span>
+              <span class="star active" data-val="4">★</span>
+              <span class="star active" data-val="5">★</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-textarea" id="fb-message" rows="3"></textarea>
+          </div>
+          <button class="btn btn-success" style="width:100%;justify-content:center" onclick="submitFeedback()"><i class="fa fa-paper-plane"></i> Submit</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><h3>All Feedback</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Name</th><th>Score</th><th>Message</th><th>Status</th><th></th></tr></thead>
+            <tbody id="feedbackTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: ROOM BOOKINGS                                   -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-roombookings">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3><i class="fa fa-calendar-check" style="color:var(--accent);margin-right:6px"></i>Room Bookings</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input class="form-input" id="rb-filter-date" type="date" style="max-width:160px;font-size:.77rem;padding:6px 10px" onchange="loadRoomBookings()"/>
+          <button class="btn btn-primary btn-sm" onclick="openRoomBookingModal()"><i class="fa fa-plus"></i> New Booking</button>
+          <button class="btn btn-outline btn-sm" onclick="loadRoomBookings()"><i class="fa fa-rotate-right"></i></button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Booking</th><th>Customer</th><th>Phone</th><th>Room</th><th>Date</th><th>Time</th><th>Hours</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="roomBookingsTableBody"><tr><td colspan="12"><div class="empty-state"><i class="fa fa-calendar-check"></i><p>No bookings</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: ROOM REPORTS                                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-roomreports">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3><i class="fa fa-chart-column" style="color:var(--accent);margin-right:6px"></i>Daily Room Report</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input class="form-input" id="rr-date" type="date" style="max-width:160px;font-size:.77rem;padding:6px 10px" onchange="loadRoomReports()"/>
+          <button class="btn btn-outline btn-sm" onclick="loadRoomReports()"><i class="fa fa-rotate-right"></i></button>
+        </div>
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(175px,1fr));margin:16px">
+        <div class="kpi-card"><div class="kpi-icon" style="background:var(--accent-light);color:var(--accent)"><i class="fa fa-door-open"></i></div><div class="kpi-value" id="rr-total-bookings">—</div><div class="kpi-label">Bookings</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(59,130,246,.1);color:#3b82f6"><i class="fa fa-clock"></i></div><div class="kpi-value" id="rr-total-hours">—</div><div class="kpi-label">Booked Hours</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(16,185,129,.1);color:var(--accent)"><i class="fa fa-money-bill-wave"></i></div><div class="kpi-value" id="rr-room-revenue">—</div><div class="kpi-label">Room Revenue</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fa fa-percent"></i></div><div class="kpi-value" id="rr-discounts">—</div><div class="kpi-label">Discounts</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(245,158,11,.1);color:#f59e0b"><i class="fa fa-chart-line"></i></div><div class="kpi-value" id="rr-net-profit">—</div><div class="kpi-label">Net Profit</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Room</th><th>Capacity</th><th>Rate</th><th>Bookings</th><th>Hours</th><th>Revenue</th><th>Discounts</th><th>Occupancy</th></tr></thead>
+          <tbody id="roomReportTableBody"><tr><td colspan="8"><div class="empty-state"><i class="fa fa-chart-column"></i><p>No report data</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PAGE: FOLLOW UPS                                      -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-followups">
+    <div class="table-card">
+      <div class="table-card-header">
+        <h3><i class="fa fa-phone-volume" style="color:var(--accent);margin-right:6px"></i>Follow Ups</h3>
+        <button class="btn btn-outline btn-sm" onclick="loadFollowUps()"><i class="fa fa-rotate-right"></i></button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Client</th><th>Phone</th><th>Last Visit</th><th>Days Absent</th><th>Status</th><th>Notes</th></tr></thead>
+          <tbody id="followUpsTableBody"><tr><td colspan="6"><div class="empty-state"><i class="fa fa-phone-volume"></i><p>No follow-ups</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end #main -->
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- MODALS                                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+
+
+<!-- ROOM BOOKING MODAL -->
+<div class="modal-overlay" id="roomBookingModal">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <h3>New Room Booking</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('roomBookingModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Customer Name</label><input class="form-input" id="rb-customer" type="text" placeholder="Customer name"/></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="rb-phone" type="tel" placeholder="01xxxxxxxxx"/></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label class="form-label">Room</label><select class="form-select" id="rb-room" onchange="previewRoomBookingPrice()"><option value="ALPHA">ALPHA — 140 EGP/hr</option><option value="BETA">BETA — 110 EGP/hr</option><option value="GAMMA">GAMMA — 90 EGP/hr</option><option value="DELTA">DELTA — 60 EGP/hr</option></select></div>
+        <div class="form-group"><label class="form-label">Payment</label><select class="form-select" id="rb-payment"><option>Cash</option><option>Instapay</option><option>Vodafone Cash</option><option>Bank Transfer</option><option>Card</option></select></div>
+        <div class="form-group"><label class="form-label">Created By</label><input class="form-input" id="rb-createdby" type="text" value="Staff"/></div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Start Time</label><input class="form-input" id="rb-start" type="datetime-local" onchange="previewRoomBookingPrice()"/></div>
+        <div class="form-group"><label class="form-label">End Time</label><input class="form-input" id="rb-end" type="datetime-local" onchange="previewRoomBookingPrice()"/></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label class="form-label">Discount Type</label><select class="form-select" id="rb-discount-type" onchange="previewRoomBookingPrice()"><option value="none">No Discount</option><option value="fixed">Fixed Amount</option><option value="percentage">Percentage</option></select></div>
+        <div class="form-group"><label class="form-label">Discount Value</label><input class="form-input" id="rb-discount-value" type="number" min="0" value="0" oninput="previewRoomBookingPrice()"/></div>
+        <div class="form-group"><label class="form-label">Discount Reason</label><input class="form-input" id="rb-discount-reason" type="text" placeholder="Student / Offer / Admin"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="rb-notes" placeholder="Any notes..."></textarea></div>
+      <div class="table-card" style="margin:0"><div style="padding:14px 18px;font-size:.82rem" id="rb-price-preview">Select start and end time to preview price.</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('roomBookingModal')">Cancel</button>
+      <button class="btn btn-success" onclick="saveRoomBooking()"><i class="fa fa-check"></i> Save Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT MODAL -->
+<div class="modal-overlay" id="clientModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="clientModalTitle">Add New Client</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('clientModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="client-edit-id"/>
+      <div class="form-group">
+        <label class="form-label">Phone Number <span style="color:var(--accent);font-size:.65rem">(Primary ID — Must be unique)</span></label>
+        <input class="form-input" id="client-phone" type="tel" placeholder="01xxxxxxxxx" oninput="validatePhoneUnique(this.value)"/>
+        <div class="field-error" id="phone-dup-error">⚠ This phone number is already registered.</div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Customer Name</label>
+          <input class="form-input" id="client-name" type="text"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account Type</label>
+          <select class="form-select" id="client-type">
+            <option>Drop-in</option><option>Monthly Member</option><option>Hourly Package</option><option>Corporate</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Lead Source / عرفنا منين؟</label>
+        <select class="form-select" id="client-lead">
+          <option value="Friends/أصحاب">Friends / أصحاب</option>
+          <option value="Facebook Page/فيسبوك">Facebook Page / فيسبوك</option>
+          <option value="Sponsored Ads/إعلان ممول">Sponsored Ads / إعلان ممول</option>
+          <option value="Mansoura University Campaign">Mansoura University Campaign</option>
+          <option value="Corporate Outflow/وفد شركة">Corporate Outflow / وفد شركة</option>
+          <option value="Other Sources/أخرى">Other Sources / أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hourly Balance (hrs)</label>
+        <input class="form-input" id="client-balance" type="number" value="0" min="0"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('clientModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()"><i class="fa fa-save"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICE MODAL -->
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="serviceModalTitle">Add Service</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('serviceModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="svc-edit-id"/>
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Service Name</label><input class="form-input" id="svc-name" type="text"/></div>
+        <div class="form-group"><label class="form-label">Category</label>
+          <select class="form-select" id="svc-cat">
+            <option>Workspace</option><option>Service</option><option>Cafe</option><option>Training</option><option>Product</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label class="form-label">Cost Price</label><input class="form-input" id="svc-cost" type="number" value="0" min="0"/></div>
+        <div class="form-group"><label class="form-label">Sell Price</label><input class="form-input" id="svc-price" type="number" value="0" min="0"/></div>
+        <div class="form-group"><label class="form-label">Stock / Cap</label><input class="form-input" id="svc-stock" type="number" value="0" min="0"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Min Alert Level</label><input class="form-input" id="svc-min" type="number" value="0" min="0"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('serviceModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveService()"><i class="fa fa-save"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSE MODAL -->
+<div class="modal-overlay" id="expenseModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Add Expense</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('expenseModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="exp-date" type="date"/></div>
+        <div class="form-group"><label class="form-label">Category</label>
+          <select class="form-select" id="exp-cat">
+            <option>Internet</option><option>Utilities</option><option>Supplies</option>
+            <option>Maintenance</option><option>Cafe Supplies</option><option>Marketing</option>
+            <option>Rent</option><option>Salaries</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="exp-desc" type="text"/></div>
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Amount (EGP)</label><input class="form-input" id="exp-amount" type="number" min="0"/></div>
+        <div class="form-group"><label class="form-label">Logged By</label><input class="form-input" id="exp-by" type="text" value="Admin"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('expenseModal')">Cancel</button>
+      <button class="btn btn-danger" id="expSaveBtn" onclick="saveExpense()"><i class="fa fa-save"></i> Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- INFLOW MODAL -->
+<div class="modal-overlay" id="inflowModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Add Manual Inflow</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('inflowModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="inf-date" type="date"/></div>
+        <div class="form-group"><label class="form-label">Category</label>
+          <select class="form-select" id="inf-cat">
+            <option>AI Course Enrollment</option><option>Locker Rental</option>
+            <option>Corporate Package</option><option>Event Hosting</option>
+            <option>Membership Fee</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="inf-desc" type="text"/></div>
+      <div class="form-grid-2">
+        <div class="form-group"><label class="form-label">Amount (EGP)</label><input class="form-input" id="inf-amount" type="number" min="0"/></div>
+        <div class="form-group"><label class="form-label">Logged By</label><input class="form-input" id="inf-by" type="text" value="Admin"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('inflowModal')">Cancel</button>
+      <button class="btn btn-success" id="infSaveBtn" onclick="saveInflow()"><i class="fa fa-save"></i> Save Inflow</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP-UP MODAL -->
+<div class="modal-overlay" id="topupModal">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-header">
+      <h3>Top-Up Hours</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('topupModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="topup-clientid"/>
+      <p id="topup-clientname" style="font-size:.83rem;color:var(--text2);margin-bottom:12px"></p>
+      <div class="form-group"><label class="form-label">Hours to Add</label><input class="form-input" id="topup-hours" type="number" min="1" value="10"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('topupModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTopUp()"><i class="fa fa-plus"></i> Top Up</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL — hidden by default, class-mounted only -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-header">
+      <h3>Receipt / Invoice</h3>
+      <button class="btn btn-outline btn-sm modal-close" onclick="closeModal('invoiceModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="receiptContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('invoiceModal')">Close</button>
+      <button class="btn btn-primary" onclick="window.print()"><i class="fa fa-print"></i> Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE DETAIL MODAL -->
+<div class="modal-overlay" id="invDetailModal">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <h3>Invoice Detail</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('invDetailModal')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="invDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('invDetailModal')">Close</button>
+      <button class="btn btn-primary" onclick="window.print()"><i class="fa fa-print"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT ENGINE                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script>
+"use strict";
+
+// ─────────────────────────────────────────────────────
+// I18N
+// ─────────────────────────────────────────────────────
+var lang = "en";
+var i18nDict = {
+  en: { tagline:"ENTERPRISE CO-WORKING SAAS", nav_overview:"Overview", nav_operations:"Operations",
+    nav_finance:"Finance", nav_engagement:"Engagement", nav_dashboard:"Dashboard",
+    nav_checkin:"Check-In / Out", nav_pos:"Point of Sale", nav_invoices:"Invoices",
+    nav_clients:"Clients / CRM", nav_services:"Services & Stock", nav_ledger:"Financial Ledger",
+    nav_shifts:"Shift Reports", nav_feedback:"Feedback", nav_roombookings:"Room Bookings", nav_roomreports:"Room Reports", nav_followups:"Follow Ups", load_demo:"Load Demo Data",
+    customer_name:"Customer Name", select_resource:"Select Resource / Workspace",
+    btn_checkin:"Check In Now", service_catalog:"Service Catalog",
+    kpi_total_clients:"Total Clients", kpi_active_sessions:"Active Sessions",
+    kpi_gross_income:"Gross Income (EGP)", kpi_net_yield:"Net Yield (EGP)",
+    kpi_low_stock:"Low Stock Alerts", kpi_avg_rating:"Avg. Feedback Score",
+    chart_revenue_7:"Revenue — Last 7 Days (EGP)", chart_expense_cat:"Expenses by Category",
+    chart_monthly:"This Month Summary (EGP)", active_sessions_title:"Active Sessions",
+    checkin_title:"Check-In" },
+  ar: { tagline:"نظام مساحات عمل مشتركة", nav_overview:"نظرة عامة", nav_operations:"العمليات",
+    nav_finance:"المالية", nav_engagement:"التفاعل", nav_dashboard:"لوحة التحكم",
+    nav_checkin:"الدخول / الخروج", nav_pos:"نقطة البيع", nav_invoices:"الفواتير",
+    nav_clients:"العملاء", nav_services:"الخدمات", nav_ledger:"الدفتر المالي",
+    nav_shifts:"الورديات", nav_feedback:"التقييمات", nav_roombookings:"حجوزات القاعات", nav_roomreports:"تقارير القاعات", nav_followups:"المتابعات", load_demo:"تحميل بيانات تجريبية",
+    customer_name:"اسم العميل", select_resource:"اختر المكان",
+    btn_checkin:"سجل الدخول", service_catalog:"كتالوج الخدمات",
+    kpi_total_clients:"إجمالي العملاء", kpi_active_sessions:"الجلسات النشطة",
+    kpi_gross_income:"الدخل الإجمالي (ج.م)", kpi_net_yield:"صافي الربح (ج.م)",
+    kpi_low_stock:"تنبيهات المخزون", kpi_avg_rating:"متوسط التقييم",
+    chart_revenue_7:"الإيرادات — آخر 7 أيام", chart_expense_cat:"المصروفات حسب الفئة",
+    chart_monthly:"ملخص الشهر الحالي", active_sessions_title:"الجلسات النشطة",
+    checkin_title:"تسجيل الدخول" }
+};
+function tr(k){ return (i18nDict[lang]&&i18nDict[lang][k]) || (i18nDict.en[k]) || k; }
+function applyTranslations(){
+  document.querySelectorAll("[data-i18n]").forEach(function(el){ el.textContent = tr(el.getAttribute("data-i18n")); });
+}
+function toggleLang(){
+  lang = (lang==="en")?"ar":"en";
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang==="ar")?"rtl":"ltr";
+  document.getElementById("langLabel").textContent = (lang==="ar")?"English":"العربية";
+  applyTranslations();
+}
+
+// ─────────────────────────────────────────────────────
+// DARK MODE
+// ─────────────────────────────────────────────────────
+var isDark = false;
+function toggleDark(){
+  isDark = !isDark;
+  document.body.classList.toggle("dark", isDark);
+  document.getElementById("darkIcon").className = isDark?"fa fa-sun":"fa fa-moon";
+  document.getElementById("darkLabel").textContent = isDark?"Light":"Dark";
+}
+
+// ─────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────
+var currentPage = "dashboard";
+document.querySelectorAll(".nav-item[data-page]").forEach(function(el){
+  el.addEventListener("click", function(){ navigateTo(el.getAttribute("data-page")); });
+});
+function navigateTo(page){
+  document.querySelectorAll(".nav-item[data-page]").forEach(function(el){
+    el.classList.toggle("active", el.getAttribute("data-page")===page);
+  });
+  document.querySelectorAll(".page").forEach(function(p){ p.classList.remove("active"); });
+  var target = document.getElementById("page-"+page);
+  if(target) target.classList.add("active");
+  currentPage = page;
+  document.getElementById("topbarTitle").textContent = tr("nav_"+page)||page;
+  loadPageData(page);
+}
+function loadPageData(page){
+  switch(page){
+    case "dashboard": loadDashboard(); break;
+    case "checkin":   loadCheckInPage(); break;
+    case "pos":       loadPOS(); break;
+    case "invoices":  loadInvoices(); break;
+    case "clients":   loadClients(); break;
+    case "services":  loadServices(); break;
+    case "ledger":    loadLedger(); break;
+    case "shifts":    loadShiftsPage(); break;
+    case "feedback":  loadFeedback(); break;
+    case "roombookings": loadRoomBookings(); break;
+    case "roomreports":  loadRoomReports(); break;
+    case "followups":    loadFollowUps(); break;
+  }
+}
+function refreshPage(){ loadPageData(currentPage); }
+
+// ─────────────────────────────────────────────────────
+// BACKEND BRIDGE — wraps google.script.run
+// ─────────────────────────────────────────────────────
+function call(action, params, cb){
+  google.script.run
+    .withSuccessHandler(function(result){ cb(null, result); })
+    .withFailureHandler(function(err){ cb(err, null); })
+    .dispatch(action, params||{});
+}
+
+// ─────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────
+function toast(msg, type){
+  type = type||"info";
+  var icons = {success:"fa-circle-check", error:"fa-circle-xmark", info:"fa-circle-info", warning:"fa-triangle-exclamation"};
+  var tc = document.getElementById("toast-container");
+  var t = document.createElement("div");
+  t.className = "toast "+type;
+  t.innerHTML = '<i class="fa '+icons[type]+' ti"></i><span>'+msg+'</span>';
+  tc.appendChild(t);
+  setTimeout(function(){ t.style.opacity="0"; t.style.transform="translateX(120%)"; t.style.transition="all .3s"; setTimeout(function(){ if(tc.contains(t)) tc.removeChild(t); },350); },3200);
+}
+
+// ─────────────────────────────────────────────────────
+// MODAL HELPERS
+// ─────────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+
+// ─────────────────────────────────────────────────────
+// FORMAT HELPERS
+// ─────────────────────────────────────────────────────
+function fmtEGP(n){ return (parseFloat(n)||0).toLocaleString("en-EG",{minimumFractionDigits:2,maximumFractionDigits:2})+" EGP"; }
+function fmtDate(d){ if(!d) return "—"; try{ return new Date(d).toLocaleDateString("en-EG",{year:"numeric",month:"short",day:"numeric"}); }catch(e){ return d; } }
+function fmtTime(d){ if(!d) return "—"; try{ return new Date(d).toLocaleTimeString("en-EG",{hour:"2-digit",minute:"2-digit"}); }catch(e){ return d; } }
+function elapsed(checkIn){
+  var ms = Date.now()-new Date(checkIn).getTime();
+  var m = Math.floor(ms/60000); var h = Math.floor(m/60); var rm = m%60;
+  return (h>0?h+"h ":"")+rm+"m";
+}
+function initials(name){ if(!name) return "?"; return name.split(" ").slice(0,2).map(function(w){ return w[0]; }).join("").toUpperCase(); }
+function todayStr(){ return new Date().toISOString().split("T")[0]; }
+
+// ─────────────────────────────────────────────────────
+// GLOBAL STATE CACHES
+// ─────────────────────────────────────────────────────
+var clientsCache  = [];   // populated on checkin / clients page load
+var servicesCache = [];   // populated on checkin / services / pos page load
+var invoicesCache = [];
+var expensesCache = [];
+var inflowsCache  = [];
+
+// Ledger running totals (maintained reactively)
+var ledgerState = { posRevenue:0, manualInflowTotal:0, grossIncome:0, totalExpenses:0, netYield:0 };
+
+// ─────────────────────────────────────────────────────
+// CHARTS
+// ─────────────────────────────────────────────────────
+var revenueChartInst=null, expenseChartInst=null, monthlyChartInst=null;
+
+function buildCharts(data){
+  var gc = isDark?"rgba(255,255,255,.05)":"rgba(0,0,0,.04)";
+  var tc = isDark?"#6b9e84":"#4a6b5c";
+  var revLabels = Object.keys(data.dailyRevenue);
+  var revVals   = revLabels.map(function(k){ return data.dailyRevenue[k]; });
+  if(revenueChartInst) revenueChartInst.destroy();
+  revenueChartInst = new Chart(document.getElementById("revenueChart"),{
+    type:"bar",
+    data:{ labels:revLabels.map(fmtDate), datasets:[{ label:"Revenue (EGP)", data:revVals, backgroundColor:"rgba(18,185,129,.7)", borderColor:"#12b981", borderWidth:2, borderRadius:6 }] },
+    options:{ responsive:true,maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:gc},ticks:{color:tc,font:{size:10}}}, y:{grid:{color:gc},ticks:{color:tc,font:{size:10}}} } }
+  });
+  var expCats = Object.keys(data.expenseByCategory);
+  var expVals = expCats.map(function(k){ return data.expenseByCategory[k]; });
+  var colors  = ["#12b981","#059669","#34d399","#6ee7b7","#f59e0b","#ef4444","#3b82f6","#8b5cf6"];
+  if(expenseChartInst) expenseChartInst.destroy();
+  expenseChartInst = new Chart(document.getElementById("expenseChart"),{
+    type:"doughnut",
+    data:{ labels:expCats, datasets:[{ data:expVals, backgroundColor:colors, borderWidth:0 }] },
+    options:{ responsive:true,maintainAspectRatio:false, plugins:{ legend:{ position:"bottom", labels:{color:tc,font:{size:10},padding:7,boxWidth:11} } } }
+  });
+  if(monthlyChartInst) monthlyChartInst.destroy();
+  monthlyChartInst = new Chart(document.getElementById("monthlyChart"),{
+    type:"bar",
+    data:{ labels:["POS Revenue","Manual Inflows","Expenses"], datasets:[{ data:[data.monthlyPOS,data.monthlyInflows,data.monthlyExpenses], backgroundColor:["rgba(18,185,129,.8)","rgba(5,150,105,.8)","rgba(239,68,68,.8)"], borderRadius:8 }] },
+    options:{ responsive:true,maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{color:tc,font:{size:10}}}, y:{grid:{color:gc},ticks:{color:tc,font:{size:10}}} } }
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────────────
+function loadDashboard(){
+  call("getDashboardKPIs",{},function(err,data){
+    if(err||!data||!data.success){ toast("Error loading dashboard","error"); return; }
+    animateKPI("kpi-clients", data.totalClients);
+    animateKPI("kpi-sessions", data.activeSessions);
+    document.getElementById("kpi-gross").textContent  = fmtEGP(data.grossIncome);
+    document.getElementById("kpi-net").textContent    = fmtEGP(data.netYield);
+    document.getElementById("kpi-alerts").textContent = data.lowStockAlerts;
+    document.getElementById("kpi-rating").textContent = data.avgFeedbackScore+" / 5";
+    buildCharts(data);
+    loadDashActiveSessions();
+  });
+}
+function animateKPI(id, val){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = val;
+  el.classList.remove("kpi-value-updating");
+  void el.offsetWidth;
+  el.classList.add("kpi-value-updating");
+}
+function loadDashActiveSessions(){
+  call("getActiveSessions",{},function(err,sessions){
+    var el = document.getElementById("dashSessionList");
+    if(!sessions||!sessions.length){ el.innerHTML='<div class="empty-state"><i class="fa fa-door-open"></i><p>No active sessions</p></div>'; return; }
+    el.innerHTML = sessions.map(function(s){
+      return '<div class="session-card">'+
+        '<div class="session-avatar">'+initials(s.CustomerName)+'</div>'+
+        '<div class="session-info"><div class="session-name">'+(s.CustomerName||"Walk-in")+'</div>'+
+        '<div class="session-meta"><i class="fa fa-location-dot" style="color:var(--accent);margin-right:4px"></i>'+(s.ResourceName||"")+'&nbsp;·&nbsp;<i class="fa fa-clock" style="color:var(--text2);margin-right:4px"></i>'+elapsed(s.CheckInTime)+'</div></div>'+
+        '<span class="badge-pill badge-green">Active</span>'+
+      '</div>';
+    }).join("");
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// CHECK-IN PAGE
+// ─────────────────────────────────────────────────────
+var walkinNameUnlocked = false;
+function toggleWalkinName(){
+  walkinNameUnlocked = !walkinNameUnlocked;
+  var nameInput = document.getElementById("checkin-name");
+  nameInput.readOnly = !walkinNameUnlocked;
+  nameInput.classList.toggle("field-computed", !walkinNameUnlocked);
+  if(walkinNameUnlocked){ nameInput.value=""; nameInput.focus(); }
+}
+
+function loadCheckInPage(){
+  walkinNameUnlocked = false;
+  document.getElementById("checkin-phone").value = "";
+  document.getElementById("checkin-name").value  = "";
+  document.getElementById("checkin-clientid").value = "";
+  document.getElementById("checkin-name").readOnly = true;
+  document.getElementById("phone-ci-error").classList.remove("show");
+
+  call("getClients",{},function(err,clients){
+    clientsCache = clients||[];
+    call("getServices",{},function(err2,services){
+      servicesCache = services||[];
+      var resSel = document.getElementById("checkin-resource");
+      resSel.innerHTML = '<option value="">— Select Resource —</option>';
+      servicesCache.filter(function(s){ return s.Category==="Workspace"; }).forEach(function(s){
+        resSel.innerHTML += '<option value="'+s.ServiceID+'" data-name="'+s.ServiceName+'">'+s.ServiceName+' — '+s.Price+' EGP/hr</option>';
+      });
+      loadActiveSessions();
+    });
+  });
+}
+
+// ── FEATURE 2: Phone autocomplete (Updated for Auto-Fill) ──
+var acDebounceTimer = null;
+function handlePhoneAutocomplete(val){
+  clearTimeout(acDebounceTimer);
+  var list = document.getElementById("phoneAutocompleteList");
+  var nameInput = document.getElementById("checkin-name");
+  var cidInput  = document.getElementById("checkin-clientid");
+  var errEl     = document.getElementById("phone-ci-error");
+
+  val = val.trim();
+  if(val.length < 3){ 
+    if(list) list.classList.remove("open"); 
+    nameInput.value = ""; 
+    cidInput.value = ""; 
+    nameInput.classList.remove("input-success"); 
+    return; 
+  }
+
+  acDebounceTimer = setTimeout(function(){
+    var matches = clientsCache.filter(function(c){ 
+      return String(c.PhoneNumber||"").includes(val) || String(c.ClientID||"").includes(val); 
+    });
+
+    // 🚀 ذكاء التعبئة التلقائية: لو الرقم كامل وموجود بالظبط، املأ البيانات فوراً
+    var exactMatch = clientsCache.find(function(c) {
+      return String(c.PhoneNumber || c.ClientID || "").trim() === val;
+    });
+
+    if (val.length >= 10 && exactMatch) {
+      selectClientFromAutocomplete(exactMatch.ClientID, encodeURIComponent(exactMatch.CustomerName||""), encodeURIComponent(String(exactMatch.PhoneNumber||"")));
+      if(list) list.classList.remove("open");
+      return;
+    }
+
+    if(!matches.length){ 
+      if(list) list.classList.remove("open"); 
+      if(errEl) errEl.classList.add("show"); 
+      nameInput.value = ""; 
+      cidInput.value = ""; 
+      return; 
+    }
+
+    if(errEl) errEl.classList.remove("show");
+    if(list) {
+      list.innerHTML = matches.slice(0,6).map(function(c){
+        return '<div class="autocomplete-item" onclick="selectClientFromAutocomplete(\''+c.ClientID+'\',\''+encodeURIComponent(c.CustomerName||"")+'\',\''+encodeURIComponent(String(c.PhoneNumber||""))+'\')">'+
+               '<span class="match-phone">'+(c.PhoneNumber||c.ClientID)+'</span>&nbsp;'+
+               '<span class="match-name">'+(c.CustomerName||"")+'</span>'+
+               '</div>';
+      }).join("");
+      list.classList.add("open");
+    }
+  }, 280);
+}
+
+function selectClientFromAutocomplete(clientId, encodedName, encodedPhone){
+  var name  = decodeURIComponent(encodedName);
+  var phone = decodeURIComponent(encodedPhone);
+  document.getElementById("checkin-phone").value    = phone||clientId;
+  document.getElementById("checkin-name").value     = name;
+  document.getElementById("checkin-clientid").value = clientId;
+  document.getElementById("checkin-name").classList.add("input-success");
+  document.getElementById("phoneAutocompleteList").classList.remove("open");
+  document.getElementById("phone-ci-error").classList.remove("show");
+}
+
+// Close autocomplete on outside click
+document.addEventListener("click", function(e){
+  var wrap = document.querySelector(".autocomplete-wrap");
+  if(wrap && !wrap.contains(e.target)) document.getElementById("phoneAutocompleteList").classList.remove("open");
+});
+
+function loadActiveSessions(){
+  call("getActiveSessions",{},function(err,sessions){
+    var el = document.getElementById("activeSessionsList");
+    if(!sessions||!sessions.length){ el.innerHTML='<div class="empty-state"><i class="fa fa-door-open"></i><p>No active sessions</p></div>'; return; }
+    el.innerHTML = sessions.map(function(s){
+      return '<div class="session-card" id="scard-'+s.SessionID+'">'+
+        '<div class="session-avatar">'+initials(s.CustomerName)+'</div>'+
+        '<div class="session-info"><div class="session-name">'+(s.CustomerName||"Walk-in")+'</div>'+
+        '<div class="session-meta"><i class="fa fa-location-dot" style="color:var(--accent);margin-right:4px"></i>'+(s.ResourceName||"")+'&nbsp;·&nbsp;Checked in '+fmtTime(s.CheckInTime)+'</div></div>'+
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'+
+          '<span class="session-timer" id="stimer-'+s.SessionID+'">'+elapsed(s.CheckInTime)+'</span>'+
+          '<button class="btn btn-danger btn-xs" onclick="doCheckOut(\''+s.SessionID+'\',\''+s.ClientID+'\',\''+encodeURIComponent(s.CustomerName||"")+'\',\''+encodeURIComponent(s.ResourceName||"")+'\',\''+s.CheckInTime+'\')"><i class="fa fa-arrow-right-from-bracket"></i> Check Out &amp; POS</button>'+
+        '</div>'+
+      '</div>';
+    }).join("");
+    // Live timers
+    sessions.forEach(function(s){
+      (function(ses){
+        setInterval(function(){
+          var el2 = document.getElementById("stimer-"+ses.SessionID);
+          if(el2) el2.textContent = elapsed(ses.CheckInTime);
+        }, 30000);
+      })(s);
+    });
+  });
+}
+
+function doCheckIn(){
+  var phoneVal  = document.getElementById("checkin-phone").value.trim();
+  var clientId  = document.getElementById("checkin-clientid").value.trim();
+  var nameVal   = document.getElementById("checkin-name").value.trim();
+  var resSel    = document.getElementById("checkin-resource");
+  var resourceId   = resSel.value;
+  var resourceName = resSel.selectedIndex>0 ? resSel.options[resSel.selectedIndex].getAttribute("data-name") : "";
+
+  if(!nameVal){ toast("Enter or select a customer name","error"); return; }
+  if(!resourceId){ toast("Please select a resource","error"); return; }
+
+  // If no client matched, use phone as ID (walk-in registration is optional)
+  var finalClientId   = clientId || phoneVal || "";
+  var finalCustomerName = nameVal;
+
+  call("executeCheckIn",{ clientId:finalClientId, customerName:finalCustomerName, resourceId:resourceId, resourceName:resourceName },function(err,res){
+    if(err||!res||!res.success){ toast("Check-in failed: "+(res?res.error:err),"error"); return; }
+    toast(finalCustomerName+" checked in to "+resourceName,"success");
+    document.getElementById("checkin-phone").value = "";
+    document.getElementById("checkin-name").value  = "";
+    document.getElementById("checkin-clientid").value = "";
+    document.getElementById("checkin-name").classList.remove("input-success");
+    document.getElementById("checkin-resource").value = "";
+    document.getElementById("phoneAutocompleteList").classList.remove("open");
+    document.getElementById("phone-ci-error").classList.remove("show");
+    loadActiveSessions();
+  });
+}
+
+// ── FEATURE 1: Check-Out → POS Automated Workflow ──
+function doCheckOut(sessionId, clientId, encodedName, encodedResource, checkInTime){
+  var customerName = decodeURIComponent(encodedName);
+  var resourceName = decodeURIComponent(encodedResource);
+
+  // Disable button immediately to prevent double-click
+  var btn = document.querySelector('[onclick*="'+sessionId+'"]');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>'; }
+
+  call("executeCheckOut",{ sessionId:sessionId },function(err,res){
+    if(err||!res||!res.success){
+      toast("Check-out failed: "+(res?res.error:"Server error"),"error");
+      if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa fa-arrow-right-from-bracket"></i> Check Out & POS'; }
+      return;
+    }
+    toast(res.customerName+" checked out — "+res.durationMinutes+"min — "+fmtEGP(res.totalCharge),"success");
+
+    // ── Transition to POS and inject session line item ──
+    injectSessionIntoPOS(res);
+  });
+}
+
+function injectSessionIntoPOS(checkoutData){
+  // Navigate to POS
+  navigateTo("pos");
+
+  // Show session banner
+  var banner = document.getElementById("posSessionBanner");
+  if(banner){
+    banner.style.display="flex";
+    document.getElementById("posSessionBannerText").textContent =
+      "Session for "+checkoutData.customerName+" ("+checkoutData.resourceName+", "+checkoutData.durationMinutes+"min) added to cart. Add any extras below.";
+  }
+
+  // Wait for POS to fully load (services are loaded async)
+  var attempts = 0;
+  var waitForPOS = setInterval(function(){
+    attempts++;
+    if(posServices.length>0||attempts>20){
+      clearInterval(waitForPOS);
+
+      // Select the customer in the POS dropdown
+      var custSel = document.getElementById("pos-customer");
+      if(custSel && checkoutData.clientId){
+        for(var i=0;i<custSel.options.length;i++){
+          if(custSel.options[i].value===checkoutData.clientId){
+            custSel.selectedIndex=i; break;
+          }
+        }
+      }
+
+      // Build synthetic session cart item
+      var sessionItem = {
+        serviceId: "SESSION-"+checkoutData.sessionId,
+        serviceName: checkoutData.resourceName+" (Session — "+checkoutData.durationMinutes+" min)",
+        category: "Workspace",
+        quantity: 1,
+        unitPrice: parseFloat(checkoutData.totalCharge)||0,
+        lineTotal: parseFloat(checkoutData.totalCharge)||0,
+        isSessionCharge: true
+      };
+
+      // Remove any existing session charge item then prepend
+      cart = cart.filter(function(i){ return !i.isSessionCharge; });
+      cart.unshift(sessionItem);
+      renderCart();
+
+      // Highlight the injected item
+      setTimeout(function(){
+        var firstItem = document.querySelector(".cart-item");
+        if(firstItem) firstItem.classList.add("highlight");
+      }, 100);
+    }
+  }, 150);
+}
+
+// ─────────────────────────────────────────────────────
+// POS ENGINE
+// ─────────────────────────────────────────────────────
+var cart = [];
+var posServices = [];
+var catIcons = { Workspace:"fa-building", Service:"fa-wifi", Cafe:"fa-mug-hot", Training:"fa-graduation-cap", Product:"fa-box", default:"fa-tag" };
+
+function loadPOS(){
+  // Hide session banner unless injected
+  var banner = document.getElementById("posSessionBanner");
+  if(banner && !cart.find(function(i){ return i.isSessionCharge; })) banner.style.display="none";
+
+  call("getServices",{},function(err,services){
+    posServices = services||[];
+    renderServiceCatalog("all");
+    call("getClients",{},function(err2,clients){
+      var sel = document.getElementById("pos-customer");
+      sel.innerHTML = '<option value="">Walk-in</option>';
+      (clients||[]).forEach(function(c){
+        sel.innerHTML += '<option value="'+c.ClientID+'">'+c.CustomerName+'</option>';
+      });
+    });
+  });
+  // Category filter buttons
+  document.querySelectorAll(".cat-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".cat-btn").forEach(function(b){ b.classList.remove("btn-primary"); b.classList.add("btn-outline"); });
+      btn.classList.add("btn-primary"); btn.classList.remove("btn-outline");
+      renderServiceCatalog(btn.getAttribute("data-cat"));
+    });
+  });
+  renderCart();
+}
+
+function renderServiceCatalog(cat){
+  var filtered = cat==="all" ? posServices : posServices.filter(function(s){ return s.Category===cat; });
+  var el = document.getElementById("serviceCatalog");
+  if(!filtered.length){ el.innerHTML='<div class="empty-state"><i class="fa fa-box"></i><p>No services</p></div>'; return; }
+  el.innerHTML = filtered.map(function(s){
+    var icon = catIcons[s.Category]||catIcons.default;
+    return '<div class="svc-tile" onclick="addToCart(\''+s.ServiceID+'\')">'+
+      '<div class="svc-icon"><i class="fa '+icon+'" style="color:var(--accent)"></i></div>'+
+      '<div class="svc-name">'+s.ServiceName+'</div>'+
+      '<div class="svc-price">'+fmtEGP(s.Price)+'</div>'+
+    '</div>';
+  }).join("");
+}
+
+function addToCart(serviceId){
+  var svc = posServices.find(function(s){ return s.ServiceID===serviceId; });
+  if(!svc) return;
+  var existing = cart.find(function(i){ return i.serviceId===serviceId; });
+  if(existing){ existing.quantity++; existing.lineTotal=existing.quantity*existing.unitPrice; }
+  else{ cart.push({ serviceId:svc.ServiceID, serviceName:svc.ServiceName, category:svc.Category, quantity:1, unitPrice:parseFloat(svc.Price)||0, lineTotal:parseFloat(svc.Price)||0 }); }
+  renderCart();
+}
+
+function removeFromCart(serviceId){
+  cart = cart.filter(function(i){ return i.serviceId!==serviceId; });
+  renderCart();
+}
+
+function changeQty(serviceId, delta){
+  var item = cart.find(function(i){ return i.serviceId===serviceId; });
+  if(!item) return;
+  item.quantity = Math.max(1, item.quantity+delta);
+  item.lineTotal = item.quantity*item.unitPrice;
+  renderCart();
+}
+
+function clearCart(){
+  cart=[];
+  var banner = document.getElementById("posSessionBanner");
+  if(banner) banner.style.display="none";
+  renderCart();
+}
+
+function renderCart(){
+  var el = document.getElementById("cartItems");
+  if(!cart.length){ el.innerHTML='<div class="empty-state" style="padding:26px 0"><i class="fa fa-cart-shopping"></i><p>Cart is empty</p></div>'; updateCartTotal(); return; }
+  el.innerHTML = cart.map(function(item){
+    var isSession = item.isSessionCharge;
+    var editBtns = isSession
+      ? '<button class="qty-btn" onclick="removeFromCart(\''+item.serviceId+'\')" style="color:var(--danger);border-color:var(--danger)" title="Remove session"><i class="fa fa-trash" style="font-size:.65rem"></i></button>'
+      : '<button class="qty-btn" onclick="changeQty(\''+item.serviceId+'\',-1)">−</button>'+
+        '<span style="font-size:.78rem;font-weight:700;min-width:18px;text-align:center">'+item.quantity+'</span>'+
+        '<button class="qty-btn" onclick="changeQty(\''+item.serviceId+'\',1)">+</button>'+
+        '<button class="qty-btn" onclick="removeFromCart(\''+item.serviceId+'\')" style="color:var(--danger);border-color:var(--danger)"><i class="fa fa-trash" style="font-size:.65rem"></i></button>';
+    return '<div class="cart-item'+(isSession?" highlight":"")+'">'+
+      '<div class="cart-item-info">'+
+        '<div class="cart-item-name">'+(isSession?'<i class="fa fa-clock" style="color:var(--accent);margin-right:4px"></i>':'')+item.serviceName+'</div>'+
+        '<div class="cart-item-price">'+fmtEGP(item.unitPrice)+(isSession?'':' × '+item.quantity)+' = <strong>'+fmtEGP(item.lineTotal)+'</strong></div>'+
+      '</div>'+
+      '<div class="cart-qty-ctrl">'+editBtns+'</div>'+
+    '</div>';
+  }).join("");
+  updateCartTotal();
+}
+
+function updateCartTotal(){
+  var subtotal  = cart.reduce(function(s,i){ return s+i.lineTotal; }, 0);
+  var discount  = parseFloat(document.getElementById("pos-discount").value)||0;
+  var total     = Math.max(0, subtotal-discount);
+  document.getElementById("cart-subtotal").textContent = fmtEGP(subtotal);
+  document.getElementById("cart-discount").textContent = fmtEGP(discount);
+  document.getElementById("cart-total").textContent    = fmtEGP(total);
+}
+
+function checkoutPOS(){
+  if(!cart.length){ toast("Cart is empty","error"); return; }
+  var custSel   = document.getElementById("pos-customer");
+  var clientId  = custSel.value;
+  var custName  = clientId ? custSel.options[custSel.selectedIndex].textContent : "Walk-in";
+  var discount  = parseFloat(document.getElementById("pos-discount").value)||0;
+  var payment   = document.getElementById("pos-payment").value;
+  var subtotal  = cart.reduce(function(s,i){ return s+i.lineTotal; },0);
+  var total     = Math.max(0, subtotal-discount);
+
+  var params = { customerName:custName, clientId:clientId, discount:discount, tax:0, paymentMethod:payment, handledBy:"Staff", b2bTabStatus:"N/A", items:cart };
+  call("createInvoice",params,function(err,res){
+    if(err||!res||!res.success){ toast("Checkout failed: "+(res?res.error:err),"error"); return; }
+    toast("Invoice "+res.invoiceId+" — "+fmtEGP(total)+" created","success");
+    showPOSReceipt(res.invoiceId, custName, cart, subtotal, discount, total, payment);
+    cart=[];
+    var banner = document.getElementById("posSessionBanner");
+    if(banner) banner.style.display="none";
+    document.getElementById("pos-discount").value="0";
+    renderCart();
+    // Refresh invoice cache silently
+    call("getInvoices",{},function(e,inv){ if(inv) invoicesCache=inv; });
+  });
+}
+
+function showPOSReceipt(invoiceId, custName, items, subtotal, discount, total, payment){
+  var rows = items.map(function(i){ return '<tr><td>'+i.serviceName+'</td><td style="text-align:center">'+i.quantity+'</td><td style="text-align:right">'+fmtEGP(i.lineTotal)+'</td></tr>'; }).join("");
+  var content = document.getElementById("receiptContent");
+  content.innerHTML =
+    '<div style="font-family:\'Syne\',sans-serif;text-align:center;margin-bottom:12px">'+
+      '<h2 style="font-size:1.25rem;font-weight:800;color:var(--accent)">TECHNO CLUB</h2>'+
+      '<p style="font-size:.68rem;color:var(--text2)">Tax Invoice · '+invoiceId+'</p>'+
+      '<p style="font-size:.68rem;color:var(--text2)">'+new Date().toLocaleString()+'</p>'+
+    '</div>'+
+    '<hr style="border:none;border-top:1px dashed var(--border);margin:8px 0"/>'+
+    '<p style="font-size:.78rem;margin-bottom:8px"><strong>Customer:</strong> '+custName+'</p>'+
+    '<table style="width:100%;font-size:.76rem;color:var(--text)">'+
+      '<thead><tr style="color:var(--text2);font-size:.65rem;border-bottom:1px solid var(--border)">'+
+        '<th style="text-align:left;padding-bottom:4px">Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th>'+
+      '</tr></thead><tbody>'+rows+'</tbody>'+
+    '</table>'+
+    '<hr style="border:none;border-top:1px dashed var(--border);margin:8px 0"/>'+
+    '<div style="font-size:.76rem;color:var(--text2);display:flex;justify-content:space-between"><span>Subtotal:</span><span>'+fmtEGP(subtotal)+'</span></div>'+
+    '<div style="font-size:.76rem;color:var(--text2);display:flex;justify-content:space-between"><span>Discount:</span><span>−'+fmtEGP(discount)+'</span></div>'+
+    '<div style="font-size:.98rem;font-weight:800;color:var(--text);display:flex;justify-content:space-between;margin-top:6px"><span>TOTAL:</span><span style="color:var(--accent)">'+fmtEGP(total)+'</span></div>'+
+    '<div style="font-size:.7rem;color:var(--text2);margin-top:4px">Payment: '+payment+'</div>'+
+    '<div style="text-align:center;margin-top:14px;font-size:.68rem;color:var(--text2)">شكراً لزيارتكم · Thank you for choosing Techno Club!</div>';
+  document.getElementById("invoiceModal").classList.add("open");
+}
+
+// ─────────────────────────────────────────────────────
+// INVOICES
+// ─────────────────────────────────────────────────────
+function loadInvoices(){
+  call("getInvoices",{},function(err,invoices){
+    invoicesCache = invoices||[];
+    renderInvoiceTable(invoicesCache);
+  });
+}
+function renderInvoiceTable(invoices){
+  var tbody = document.getElementById("invoiceTableBody");
+  if(!invoices.length){ tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa fa-file-invoice"></i><p>No invoices</p></div></td></tr>'; return; }
+  tbody.innerHTML = invoices.map(function(inv){
+    var b2b = inv.B2B_TabStatus==="Open"?'<span class="badge-pill badge-yellow">Open Tab</span>':'<span class="badge-pill badge-gray">N/A</span>';
+    return '<tr>'+
+      '<td><code style="font-size:.68rem;color:var(--accent)">'+(inv.InvoiceID||"")+'</code></td>'+
+      '<td>'+fmtDate(inv.Date)+'</td>'+
+      '<td>'+(inv.CustomerName||"Walk-in")+'</td>'+
+      '<td><strong>'+fmtEGP(inv.Total)+'</strong></td>'+
+      '<td><span class="badge-pill badge-blue">'+(inv.PaymentMethod||"")+'</span></td>'+
+      '<td>'+b2b+'</td>'+
+      '<td>'+(inv.HandledBy||"")+'</td>'+
+      '<td><button class="btn btn-outline btn-xs" onclick="viewInvoiceDetail(\''+inv.InvoiceID+'\')"><i class="fa fa-eye"></i></button></td>'+
+    '</tr>';
+  }).join("");
+}
+function filterInvoices(){
+  var q = document.getElementById("invoiceSearch").value.toLowerCase();
+  renderInvoiceTable(invoicesCache.filter(function(inv){ return (inv.InvoiceID||"").toLowerCase().includes(q)||(inv.CustomerName||"").toLowerCase().includes(q)||(inv.PaymentMethod||"").toLowerCase().includes(q); }));
+}
+function viewInvoiceDetail(invoiceId){
+  var inv = invoicesCache.find(function(i){ return i.InvoiceID===invoiceId; });
+  if(!inv) return;
+  call("getInvoiceItems",{ invoiceId:invoiceId },function(err,items){
+    var rows = (items||[]).map(function(item){ return '<tr><td>'+item.ServiceName+'</td><td>'+item.Quantity+'</td><td>'+fmtEGP(item.UnitPrice)+'</td><td><strong>'+fmtEGP(item.LineTotal)+'</strong></td></tr>'; }).join("");
+    document.getElementById("invDetailBody").innerHTML =
+      '<div style="font-size:.81rem">'+
+        '<div class="form-grid-2" style="margin-bottom:14px">'+
+          '<div><span style="color:var(--text2)">Invoice ID:</span><br/><code style="color:var(--accent)">'+inv.InvoiceID+'</code></div>'+
+          '<div><span style="color:var(--text2)">Date:</span><br/>'+fmtDate(inv.Date)+'</div>'+
+          '<div><span style="color:var(--text2)">Customer:</span><br/><strong>'+(inv.CustomerName||"Walk-in")+'</strong></div>'+
+          '<div><span style="color:var(--text2)">Payment:</span><br/>'+inv.PaymentMethod+'</div>'+
+        '</div>'+
+        '<table style="width:100%;font-size:.76rem;margin-bottom:10px">'+
+          '<thead><tr style="color:var(--text2);font-size:.64rem"><th style="text-align:left">Item</th><th>Qty</th><th>Unit</th><th style="text-align:right">Line Total</th></tr></thead>'+
+          '<tbody>'+rows+'</tbody>'+
+        '</table>'+
+        '<hr style="border-color:var(--border);margin:8px 0"/>'+
+        '<div style="display:flex;justify-content:space-between"><span>Subtotal:</span><span>'+fmtEGP(inv.Subtotal)+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between"><span>Discount:</span><span>−'+fmtEGP(inv.Discount)+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.98rem;margin-top:4px"><span>Total:</span><span style="color:var(--accent)">'+fmtEGP(inv.Total)+'</span></div>'+
+      '</div>';
+    openModal("invDetailModal");
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// CLIENTS — FEATURE 2: Phone as Primary UID
+// ─────────────────────────────────────────────────────
+var phoneDupCheckTimer = null;
+function validatePhoneUnique(val) {
+  clearTimeout(phoneDupCheckTimer);
+  var errEl = document.getElementById("phone-dup-error");
+  var phoneInput = document.getElementById("client-phone");
+  var editId = document.getElementById("client-edit-id").value;
+  
+  if (val.length < 5) {
+    errEl.classList.remove("show");
+    phoneInput.classList.remove("input-error", "input-success");
+    return;
+  }
+  
+  phoneDupCheckTimer = setTimeout(function() {
+    // التحقق من وجود الرقم في الكاش لمنع التكرار فقط
+    var exists = clientsCache.some(function(c) {
+      var cPhone = String(c.PhoneNumber || c.ClientID || "").trim();
+      return cPhone === val.trim() && c.ClientID !== editId && c.PhoneNumber !== editId;
+    });
+    
+    if (exists) {
+      errEl.classList.add("show");
+      phoneInput.classList.add("input-error");
+      phoneInput.classList.remove("input-success");
+    } else {
+      errEl.classList.remove("show");
+      phoneInput.classList.remove("input-error");
+      phoneInput.classList.add("input-success");
+    }
+  }, 350);
+}
+
+var allClients = [];
+function loadClients(){
+  call("getClients",{},function(err,clients){
+    allClients = clients||[];
+    clientsCache = allClients;
+    renderClientTable(allClients);
+  });
+}
+function renderClientTable(clients){
+  var tbody = document.getElementById("clientTableBody");
+  if(!clients.length){ tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="fa fa-users"></i><p>No clients</p></div></td></tr>'; return; }
+  var typeBadge = {"Monthly Member":"badge-blue","Hourly Package":"badge-green","Corporate":"badge-yellow","Drop-in":"badge-gray"};
+  tbody.innerHTML = clients.map(function(c){
+    return '<tr>'+
+      '<td><code style="font-size:.72rem;color:var(--accent)">'+(c.PhoneNumber||c.ClientID||"—")+'</code></td>'+
+      '<td>'+
+        '<div style="display:flex;align-items:center;gap:7px">'+
+          '<div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.68rem">'+initials(c.CustomerName)+'</div>'+
+          '<span style="font-weight:600">'+(c.CustomerName||"—")+'</span>'+
+        '</div>'+
+      '</td>'+
+      '<td><span style="font-size:.7rem;color:var(--text2)">'+(c.LeadSource||"—")+'</span></td>'+
+      '<td><span class="badge-pill '+(typeBadge[c.AccountType]||"badge-gray")+'">'+(c.AccountType||"—")+'</span></td>'+
+      '<td><strong>'+(c.HourlyBalance||0)+' hrs</strong></td>'+
+      '<td>'+fmtDate(c.CreatedAt)+'</td>'+
+      '<td>'+
+        '<div style="display:flex;gap:4px">'+
+          '<button class="btn btn-outline btn-xs" onclick="openEditClientModal(\''+c.ClientID+'\')"><i class="fa fa-pencil"></i></button>'+
+          '<button class="btn btn-outline btn-xs" onclick="openTopUpModal(\''+c.ClientID+'\',\''+encodeURIComponent(c.CustomerName||"")+'\')" title="Top-Up Hours"><i class="fa fa-plus"></i></button>'+
+          '<button class="btn btn-danger btn-xs" onclick="deleteClient(\''+c.ClientID+'\')"><i class="fa fa-trash"></i></button>'+
+        '</div>'+
+      '</td>'+
+    '</tr>';
+  }).join("");
+}
+function filterClients(){
+  var q = document.getElementById("clientSearch").value.toLowerCase();
+  renderClientTable(allClients.filter(function(c){ return (c.CustomerName||"").toLowerCase().includes(q)||(String(c.PhoneNumber||"")).includes(q)||(c.AccountType||"").toLowerCase().includes(q); }));
+}
+function openAddClientModal(){
+  document.getElementById("client-edit-id").value="";
+  document.getElementById("client-phone").value="";
+  document.getElementById("client-name").value="";
+  document.getElementById("client-type").value="Drop-in";
+  document.getElementById("client-lead").value="Friends/أصحاب";
+  document.getElementById("client-balance").value="0";
+  document.getElementById("client-phone").classList.remove("input-error","input-success");
+  document.getElementById("phone-dup-error").classList.remove("show");
+  document.getElementById("clientModalTitle").textContent="Add New Client";
+  // Ensure clientsCache is fresh for dup check
+  call("getClients",{},function(e,cl){ if(cl){ clientsCache=cl; allClients=cl; } });
+  openModal("clientModal");
+}
+function openEditClientModal(clientId){
+  var c = allClients.find(function(x){ return x.ClientID===clientId; });
+  if(!c) return;
+  document.getElementById("client-edit-id").value=c.ClientID;
+  document.getElementById("client-phone").value=c.PhoneNumber||c.ClientID;
+  document.getElementById("client-name").value=c.CustomerName;
+  document.getElementById("client-type").value=c.AccountType;
+  document.getElementById("client-lead").value=c.LeadSource||"Friends/أصحاب";
+  document.getElementById("client-balance").value=c.HourlyBalance||0;
+  document.getElementById("client-phone").classList.remove("input-error","input-success");
+  document.getElementById("phone-dup-error").classList.remove("show");
+  document.getElementById("clientModalTitle").textContent="Edit Client";
+  openModal("clientModal");
+}
+function saveClient(){
+  var phone   = document.getElementById("client-phone").value.trim();
+  var name    = document.getElementById("client-name").value.trim();
+  var editId  = document.getElementById("client-edit-id").value;
+
+  if(!phone){ toast("Phone number is required","error"); return; }
+  if(!name){ toast("Customer name is required","error"); return; }
+
+  // Client-side dup check (server also validates via sheet scan)
+  var isDup = clientsCache.some(function(c){
+    var cp = String(c.PhoneNumber||c.ClientID||"");
+    return cp===phone && c.ClientID!==editId && c.PhoneNumber!==editId;
+  });
+  if(isDup && !editId){ toast("⚠ This phone number is already registered","error"); return; }
+
+  var params = {
+    clientId: editId || phone,   // phone is the primary ID for new clients
+    customerName: name,
+    phoneNumber: phone,
+    leadSource: document.getElementById("client-lead").value,
+    accountType: document.getElementById("client-type").value,
+    hourlyBalance: document.getElementById("client-balance").value
+  };
+  var action = editId ? "updateClient" : "addClient";
+  call(action,params,function(err,res){
+    if(err||!res||!res.success){ toast("Failed: "+(res?res.error:err),"error"); return; }
+    toast(editId?"Client updated":"Client registered","success");
+    closeModal("clientModal");
+    loadClients();
+  });
+}
+function deleteClient(clientId){
+  if(!confirm("Delete this client? This cannot be undone.")) return;
+  call("deleteClient",{ clientId:clientId },function(err,res){
+    if(err||!res||!res.success){ toast("Failed","error"); return; }
+    toast("Client deleted","success");
+    loadClients();
+  });
+}
+function openTopUpModal(clientId, encodedName){
+  document.getElementById("topup-clientid").value=clientId;
+  document.getElementById("topup-clientname").textContent="Client: "+decodeURIComponent(encodedName);
+  document.getElementById("topup-hours").value="10";
+  openModal("topupModal");
+}
+function saveTopUp(){
+  var clientId = document.getElementById("topup-clientid").value;
+  var hours    = document.getElementById("topup-hours").value;
+  call("topUpClientHours",{ clientId:clientId, hours:hours },function(err,res){
+    if(err||!res||!res.success){ toast("Failed","error"); return; }
+    toast("Balance updated to "+res.newBalance+" hrs","success");
+    closeModal("topupModal");
+    loadClients();
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// SERVICES
+// ─────────────────────────────────────────────────────
+var allServices = [];
+function loadServices(){
+  call("getServices",{},function(err,services){
+    allServices = services||[];
+    renderServiceTable(allServices);
+  });
+}
+function renderServiceTable(services){
+  var tbody = document.getElementById("serviceTableBody");
+  if(!services.length){ tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa fa-grid-2"></i><p>No services</p></div></td></tr>'; return; }
+  tbody.innerHTML = services.map(function(s){
+    var stock=parseFloat(s.CapacityOrStock)||0; var minA=parseFloat(s.MinAlert)||0;
+    var isLow=minA>0&&stock<=minA;
+    return '<tr>'+
+      '<td><strong>'+s.ServiceName+'</strong></td>'+
+      '<td><span class="badge-pill badge-mint">'+s.Category+'</span></td>'+
+      '<td>'+fmtEGP(s.CostPrice)+'</td>'+
+      '<td><strong style="color:var(--accent)">'+fmtEGP(s.Price)+'</strong></td>'+
+      '<td>'+s.CapacityOrStock+'</td>'+
+      '<td>'+s.MinAlert+'</td>'+
+      '<td>'+(isLow?'<span class="badge-pill badge-red"><i class="fa fa-triangle-exclamation"></i> Low</span>':'<span class="badge-pill badge-green">OK</span>')+'</td>'+
+      '<td><div style="display:flex;gap:4px">'+
+        '<button class="btn btn-outline btn-xs" onclick="openEditServiceModal(\''+s.ServiceID+'\')"><i class="fa fa-pencil"></i></button>'+
+        '<button class="btn btn-danger btn-xs" onclick="deleteService(\''+s.ServiceID+'\')"><i class="fa fa-trash"></i></button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join("");
+}
+function openAddServiceModal(){
+  document.getElementById("svc-edit-id").value="";
+  ["svc-name","svc-cost","svc-price","svc-stock","svc-min"].forEach(function(id){ document.getElementById(id).value=(id==="svc-name"?"":"0"); });
+  document.getElementById("svc-cat").value="Workspace";
+  document.getElementById("serviceModalTitle").textContent="Add Service";
+  openModal("serviceModal");
+}
+function openEditServiceModal(serviceId){
+  var s = allServices.find(function(x){ return x.ServiceID===serviceId; });
+  if(!s) return;
+  document.getElementById("svc-edit-id").value=s.ServiceID;
+  document.getElementById("svc-name").value=s.ServiceName;
+  document.getElementById("svc-cat").value=s.Category;
+  document.getElementById("svc-cost").value=s.CostPrice;
+  document.getElementById("svc-price").value=s.Price;
+  document.getElementById("svc-stock").value=s.CapacityOrStock;
+  document.getElementById("svc-min").value=s.MinAlert;
+  document.getElementById("serviceModalTitle").textContent="Edit Service";
+  openModal("serviceModal");
+}
+function saveService(){
+  var editId = document.getElementById("svc-edit-id").value;
+  var params = { serviceId:editId, serviceName:document.getElementById("svc-name").value.trim(), category:document.getElementById("svc-cat").value, costPrice:document.getElementById("svc-cost").value, price:document.getElementById("svc-price").value, capacityOrStock:document.getElementById("svc-stock").value, minAlert:document.getElementById("svc-min").value };
+  if(!params.serviceName){ toast("Service name required","error"); return; }
+  call(editId?"updateService":"addService",params,function(err,res){
+    if(err||!res||!res.success){ toast("Failed: "+(res?res.error:err),"error"); return; }
+    toast(editId?"Service updated":"Service added","success");
+    closeModal("serviceModal");
+    loadServices();
+  });
+}
+function deleteService(serviceId){
+  if(!confirm("Delete this service?")) return;
+  call("deleteService",{ serviceId:serviceId },function(err,res){
+    if(err||!res||!res.success){ toast("Failed","error"); return; }
+    toast("Service deleted","success");
+    loadServices();
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// FINANCIAL LEDGER — FEATURE 3: Reactive no-refresh updates
+// ─────────────────────────────────────────────────────
+function loadLedger(){
+  call("getFinancialSummary",{},function(err,data){
+    if(!data||!data.success){ toast("Error loading ledger","error"); return; }
+    ledgerState = { posRevenue:data.posRevenue, manualInflowTotal:data.manualInflowTotal, grossIncome:data.grossIncome, totalExpenses:data.totalExpenses, netYield:data.netYield };
+    applyLedgerKPIs();
+  });
+  call("getExpenses",{},function(err,expenses){
+    expensesCache = expenses||[];
+    renderExpenseRows(expensesCache);
+  });
+  call("getManualInflows",{},function(err,inflows){
+    inflowsCache = inflows||[];
+    renderInflowRows(inflowsCache);
+  });
+}
+
+function applyLedgerKPIs(){
+  animateKPI("led-pos",    fmtEGP(ledgerState.posRevenue));
+  animateKPI("led-inflows",fmtEGP(ledgerState.manualInflowTotal));
+  animateKPI("led-gross",  fmtEGP(ledgerState.grossIncome));
+  animateKPI("led-expenses",fmtEGP(ledgerState.totalExpenses));
+  var netEl = document.getElementById("led-net");
+  if(netEl){
+    netEl.textContent = fmtEGP(ledgerState.netYield);
+    netEl.style.color = ledgerState.netYield>=0?"var(--accent)":"var(--danger)";
+    netEl.classList.remove("kpi-value-updating"); void netEl.offsetWidth; netEl.classList.add("kpi-value-updating");
+  }
+}
+
+function recomputeLedgerLocally(){
+  ledgerState.grossIncome = ledgerState.posRevenue + ledgerState.manualInflowTotal;
+  ledgerState.netYield    = ledgerState.grossIncome - ledgerState.totalExpenses;
+  applyLedgerKPIs();
+}
+
+function renderExpenseRows(expenses){
+  var tbody = document.getElementById("expenseTableBody");
+  if(!tbody) return;
+  if(!expenses.length){ tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><i class="fa fa-receipt"></i><p>No expenses</p></div></td></tr>'; return; }
+  tbody.innerHTML = expenses.map(function(e){
+    return '<tr id="erow-'+e.ExpenseID+'">'+
+      '<td>'+fmtDate(e.Date)+'</td>'+
+      '<td><span class="badge-pill badge-red">'+e.Category+'</span></td>'+
+      '<td style="font-size:.73rem">'+e.Description+'</td>'+
+      '<td><strong style="color:var(--danger)">'+fmtEGP(e.Amount)+'</strong></td>'+
+      '<td><button class="btn btn-danger btn-xs" onclick="deleteExpense(\''+e.ExpenseID+'\')"><i class="fa fa-trash"></i></button></td>'+
+    '</tr>';
+  }).join("");
+}
+
+function renderInflowRows(inflows){
+  var tbody = document.getElementById("inflowTableBody");
+  if(!tbody) return;
+  if(!inflows.length){ tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><i class="fa fa-money-bill"></i><p>No inflows</p></div></td></tr>'; return; }
+  tbody.innerHTML = inflows.map(function(inf){
+    return '<tr id="irow-'+inf.InflowID+'">'+
+      '<td>'+fmtDate(inf.Date)+'</td>'+
+      '<td><span class="badge-pill badge-green">'+inf.Category+'</span></td>'+
+      '<td style="font-size:.73rem">'+inf.Description+'</td>'+
+      '<td><strong style="color:var(--accent)">'+fmtEGP(inf.Amount)+'</strong></td>'+
+      '<td><button class="btn btn-danger btn-xs" onclick="deleteManualInflow(\''+inf.InflowID+'\')"><i class="fa fa-trash"></i></button></td>'+
+    '</tr>';
+  }).join("");
+}
+
+function openAddExpenseModal(){
+  document.getElementById("exp-date").value=todayStr();
+  document.getElementById("exp-desc").value="";
+  document.getElementById("exp-amount").value="";
+  document.getElementById("exp-by").value="Admin";
+  openModal("expenseModal");
+}
+function saveExpense(){
+  var params = {
+    date:document.getElementById("exp-date").value,
+    category:document.getElementById("exp-cat").value,
+    description:document.getElementById("exp-desc").value.trim(),
+    amount:document.getElementById("exp-amount").value,
+    loggedBy:document.getElementById("exp-by").value.trim()||"Admin"
+  };
+  if(!params.amount||!params.description){ toast("Fill all required fields","error"); return; }
+  var btn = document.getElementById("expSaveBtn");
+  btn.innerHTML='<span class="spinner"></span> Saving…'; btn.disabled=true;
+
+  call("addExpense",params,function(err,res){
+    btn.innerHTML='<i class="fa fa-save"></i> Save Expense'; btn.disabled=false;
+    if(err||!res||!res.success){ toast("Failed: "+(res?res.error:err),"error"); return; }
+    toast("Expense logged","success");
+    closeModal("expenseModal");
+    // ── REACTIVE: prepend row + update KPIs without reload ──
+    var amt = parseFloat(params.amount)||0;
+    var newRecord = { ExpenseID:res.expenseId||("EXP-"+Date.now()), Date:params.date, Category:params.category, Description:params.description, Amount:amt };
+    expensesCache.unshift(newRecord);
+    var tbody = document.getElementById("expenseTableBody");
+    if(tbody){
+      var emptyRow = tbody.querySelector("td[colspan]");
+      if(emptyRow) tbody.innerHTML="";
+      var tr = document.createElement("tr");
+      tr.id="erow-"+newRecord.ExpenseID;
+      tr.className="row-new";
+      tr.innerHTML=
+        '<td>'+fmtDate(newRecord.Date)+'</td>'+
+        '<td><span class="badge-pill badge-red">'+newRecord.Category+'</span></td>'+
+        '<td style="font-size:.73rem">'+newRecord.Description+'</td>'+
+        '<td><strong style="color:var(--danger)">'+fmtEGP(newRecord.Amount)+'</strong></td>'+
+        '<td><button class="btn btn-danger btn-xs" onclick="deleteExpense(\''+newRecord.ExpenseID+'\')"><i class="fa fa-trash"></i></button></td>';
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+    ledgerState.totalExpenses += amt;
+    recomputeLedgerLocally();
+  });
+}
+
+function deleteExpense(expenseId){
+  if(!confirm("Delete this expense?")) return;
+  var record = expensesCache.find(function(e){ return e.ExpenseID===expenseId; });
+  call("deleteExpense",{ expenseId:expenseId },function(err,res){
+    if(err||!res||!res.success){ toast("Failed","error"); return; }
+    toast("Expense deleted","success");
+    expensesCache = expensesCache.filter(function(e){ return e.ExpenseID!==expenseId; });
+    var row = document.getElementById("erow-"+expenseId);
+    if(row){ row.style.transition="opacity .3s"; row.style.opacity="0"; setTimeout(function(){ if(row.parentNode) row.parentNode.removeChild(row); if(!expensesCache.length) renderExpenseRows([]); },320); }
+    if(record){ ledgerState.totalExpenses -= parseFloat(record.Amount)||0; recomputeLedgerLocally(); }
+  });
+}
+
+function openAddInflowModal(){
+  document.getElementById("inf-date").value=todayStr();
+  document.getElementById("inf-desc").value="";
+  document.getElementById("inf-amount").value="";
+  document.getElementById("inf-by").value="Admin";
+  openModal("inflowModal");
+}
+function saveInflow(){
+  var params = {
+    date:document.getElementById("inf-date").value,
+    category:document.getElementById("inf-cat").value,
+    description:document.getElementById("inf-desc").value.trim(),
+    amount:document.getElementById("inf-amount").value,
+    loggedBy:document.getElementById("inf-by").value.trim()||"Admin"
+  };
+  if(!params.amount||!params.description){ toast("Fill all required fields","error"); return; }
+  var btn = document.getElementById("infSaveBtn");
+  btn.innerHTML='<span class="spinner"></span> Saving…'; btn.disabled=true;
+
+  call("addManualInflow",params,function(err,res){
+    btn.innerHTML='<i class="fa fa-save"></i> Save Inflow'; btn.disabled=false;
+    if(err||!res||!res.success){ toast("Failed: "+(res?res.error:err),"error"); return; }
+    toast("Inflow recorded","success");
+    closeModal("inflowModal");
+    // ── REACTIVE: prepend row + update KPIs ──
+    var amt = parseFloat(params.amount)||0;
+    var newRecord = { InflowID:res.inflowId||("INF-"+Date.now()), Date:params.date, Category:params.category, Description:params.description, Amount:amt };
+    inflowsCache.unshift(newRecord);
+    var tbody = document.getElementById("inflowTableBody");
+    if(tbody){
+      var emptyRow = tbody.querySelector("td[colspan]");
+      if(emptyRow) tbody.innerHTML="";
+      var tr = document.createElement("tr");
+      tr.id="irow-"+newRecord.InflowID;
+      tr.className="row-new";
+      tr.innerHTML=
+        '<td>'+fmtDate(newRecord.Date)+'</td>'+
+        '<td><span class="badge-pill badge-green">'+newRecord.Category+'</span></td>'+
+        '<td style="font-size:.73rem">'+newRecord.Description+'</td>'+
+        '<td><strong style="color:var(--accent)">'+fmtEGP(newRecord.Amount)+'</strong></td>'+
+        '<td><button class="btn btn-danger btn-xs" onclick="deleteManualInflow(\''+newRecord.InflowID+'\')"><i class="fa fa-trash"></i></button></td>';
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+    ledgerState.manualInflowTotal += amt;
+    recomputeLedgerLocally();
+  });
+}
+
+function deleteManualInflow(inflowId){
+  if(!confirm("Delete this inflow?")) return;
+  var record = inflowsCache.find(function(i){ return i.InflowID===inflowId; });
+  call("deleteManualInflow",{ inflowId:inflowId },function(err,res){
+    if(err||!res||!res.success){ toast("Failed","error"); return; }
+    toast("Inflow deleted","success");
+    inflowsCache = inflowsCache.filter(function(i){ return i.InflowID!==inflowId; });
+    var row = document.getElementById("irow-"+inflowId);
+    if(row){ row.style.transition="opacity .3s"; row.style.opacity="0"; setTimeout(function(){ if(row.parentNode) row.parentNode.removeChild(row); if(!inflowsCache.length) renderInflowRows([]); },320); }
+    if(record){ ledgerState.manualInflowTotal -= parseFloat(record.Amount)||0; recomputeLedgerLocally(); }
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// SHIFTS — FEATURE 4: Auto cash-expected aggregation
+// ─────────────────────────────────────────────────────
+var shiftDataCache = [];
+
+function loadShiftsPage(){
+  document.getElementById("shift-date").value = todayStr();
+  document.getElementById("shift-expected").value = "";
+  document.getElementById("shift-expected-breakdown").textContent = "";
+  call("getShifts",{},function(err,shifts){
+    shiftDataCache = shifts||[];
+    renderShiftRows(shiftDataCache);
+  });
+}
+
+function autoComputeCashExpected(dateVal){
+  if(!dateVal){ document.getElementById("shift-expected").value=""; return; }
+  var expField = document.getElementById("shift-expected");
+  var breakdown = document.getElementById("shift-expected-breakdown");
+  expField.value="Calculating…";
+  breakdown.textContent="";
+
+  // Fetch all three data sources for the chosen date
+  var posTotal=0, inflowTotal=0, expTotal=0;
+  var fetched=0;
+  function checkDone(){
+    fetched++;
+    if(fetched<3) return;
+    var cashExpected = posTotal + inflowTotal - expTotal;
+    cashExpected = Math.max(0, Math.round(cashExpected*100)/100);
+    expField.value = cashExpected;
+    breakdown.textContent = "POS: "+fmtEGP(posTotal)+" + Inflows: "+fmtEGP(inflowTotal)+" − Expenses: "+fmtEGP(expTotal)+" = "+fmtEGP(cashExpected);
+  }
+
+  call("getInvoices",{},function(err,invoices){
+    (invoices||[]).forEach(function(inv){
+      var d = String(inv.Date||"").split("T")[0];
+      if(d===dateVal) posTotal += parseFloat(inv.Total)||0;
+    });
+    checkDone();
+  });
+  call("getManualInflows",{},function(err,inflows){
+    (inflows||[]).forEach(function(inf){
+      var d = String(inf.Date||"").split("T")[0];
+      if(d===dateVal) inflowTotal += parseFloat(inf.Amount)||0;
+    });
+    checkDone();
+  });
+  call("getExpenses",{},function(err,expenses){
+    (expenses||[]).forEach(function(exp){
+      var d = String(exp.Date||exp.CreatedAt||"").split("T")[0];
+      if(d===dateVal) expTotal += parseFloat(exp.Amount)||0;
+    });
+    checkDone();
+  });
+}
+
+function renderShiftRows(shifts){
+  var tbody = document.getElementById("shiftTableBody");
+  if(!tbody) return;
+  if(!shifts.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><i class="fa fa-clock"></i><p>No shifts logged</p></div></td></tr>'; return; }
+  tbody.innerHTML = shifts.slice().reverse().map(function(s){
+    var variance = parseFloat(s.Variance)||0;
+    var statusClass = s.Status==="Balanced"?"badge-green":(s.Status==="Surplus"?"badge-blue":"badge-red");
+    return '<tr id="shrow-'+s.ShiftID+'">'+
+      '<td>'+fmtDate(s.Date)+'</td>'+
+      '<td><strong>'+s.StaffName+'</strong></td>'+
+      '<td>'+fmtEGP(s.CashExpected)+'</td>'+
+      '<td>'+fmtEGP(s.CashReported)+'</td>'+
+      '<td style="color:'+(variance>=0?"var(--accent)":"var(--danger)")+';font-weight:700">'+(variance>=0?"+":"")+fmtEGP(variance)+'</td>'+
+      '<td><span class="badge-pill '+statusClass+'">'+s.Status+'</span></td>'+
+    '</tr>';
+  }).join("");
+}
+
+function logShift(){
+  var staffName    = document.getElementById("shift-staff").value.trim();
+  var date         = document.getElementById("shift-date").value;
+  var cashExpected = parseFloat(document.getElementById("shift-expected").value)||0;
+  var cashReported = parseFloat(document.getElementById("shift-reported").value)||0;
+  if(!staffName){ toast("Enter staff name","error"); return; }
+  if(!date){ toast("Select a date","error"); return; }
+  if(!cashReported&&cashReported!==0){ toast("Enter cash reported","error"); return; }
+
+  call("addShift",{ staffName:staffName, date:date, cashExpected:cashExpected, cashReported:cashReported },function(err,res){
+    if(err||!res||!res.success){ toast("Failed: "+(res?res.error:err),"error"); return; }
+    toast("Shift logged — "+res.status+" (Variance: "+fmtEGP(res.variance)+")","success");
+    // ── REACTIVE: prepend to table immediately ──
+    var newShift = {
+      ShiftID: res.shiftId||("SHF-"+Date.now()),
+      Date: date, StaffName: staffName,
+      CashExpected: cashExpected, CashReported: cashReported,
+      Variance: res.variance, Status: res.status
+    };
+    shiftDataCache.unshift(newShift);
+    var tbody = document.getElementById("shiftTableBody");
+    if(tbody){
+      var emptyRow = tbody.querySelector("td[colspan]");
+      if(emptyRow) tbody.innerHTML="";
+      var variance = parseFloat(res.variance)||0;
+      var statusClass = res.status==="Balanced"?"badge-green":(res.status==="Surplus"?"badge-blue":"badge-red");
+      var tr = document.createElement("tr");
+      tr.id="shrow-"+newShift.ShiftID;
+      tr.className="row-new";
+      tr.innerHTML=
+        '<td>'+fmtDate(date)+'</td>'+
+        '<td><strong>'+staffName+'</strong></td>'+
+        '<td>'+fmtEGP(cashExpected)+'</td>'+
+        '<td>'+fmtEGP(cashReported)+'</td>'+
+        '<td style="color:'+(variance>=0?"var(--accent)":"var(--danger)")+';font-weight:700">'+(variance>=0?"+":"")+fmtEGP(variance)+'</td>'+
+        '<td><span class="badge-pill '+statusClass+'">'+res.status+'</span></td>';
+      tbody.insertBefore(tr, tbody.firstChild);
+    }
+    document.getElementById("shift-staff").value="";
+    document.getElementById("shift-reported").value="";
+    document.getElementById("shift-expected").value="";
+    document.getElementById("shift-expected-breakdown").textContent="";
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// FEEDBACK
+// ─────────────────────────────────────────────────────
+var starRating = 5;
+document.querySelectorAll(".star-rating .star").forEach(function(star){
+  star.addEventListener("click", function(){
+    starRating = parseInt(star.getAttribute("data-val"));
+    document.querySelectorAll(".star-rating .star").forEach(function(s){ s.classList.toggle("active", parseInt(s.getAttribute("data-val"))<=starRating); });
+  });
+});
+
+function loadFeedback(){
+  call("getFeedback",{},function(err,feedbacks){
+    var tbody = document.getElementById("feedbackTableBody");
+    var newCount=0;
+    if(!feedbacks||!feedbacks.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><i class="fa fa-star"></i><p>No feedback yet</p></div></td></tr>'; return; }
+    tbody.innerHTML = feedbacks.slice().reverse().map(function(f){
+      if(f.Status==="New") newCount++;
+      var score=parseInt(f.Score)||0;
+      var stars="★".repeat(score)+"☆".repeat(5-score);
+      var scoreColor=["","#ef4444","#f97316","#f59e0b","#3b82f6","#12b981"][score]||"#94a3b8";
+      return '<tr>'+
+        '<td>'+fmtDate(f.Timestamp)+'</td>'+
+        '<td><strong>'+(f.ClientName||"Anonymous")+'</strong></td>'+
+        '<td><span style="color:'+scoreColor+';font-weight:700">'+stars+' '+score+'/5</span></td>'+
+        '<td style="font-size:.73rem;max-width:200px">'+(f.Message||"")+'</td>'+
+        '<td><span class="badge-pill '+(f.Status==="New"?"badge-yellow":"badge-gray")+'">'+(f.Status||"")+'</span></td>'+
+        '<td>'+(f.Status==="New"?'<button class="btn btn-outline btn-xs" onclick="markFeedbackReviewed(\''+f.FeedbackID+'\')"><i class="fa fa-check"></i></button>':'')+'</td>'+
+      '</tr>';
+    }).join("");
+    var badge = document.getElementById("newFeedbackBadge");
+    badge.style.display = newCount?"":"none";
+    badge.textContent = newCount;
+  });
+}
+function submitFeedback(){
+  var name = document.getElementById("fb-name").value.trim();
+  var msg  = document.getElementById("fb-message").value.trim();
+  if(!name){ toast("Please enter your name","error"); return; }
+  call("addFeedback",{ clientName:name, score:starRating, message:msg },function(err,res){
+    if(err||!res||!res.success){ toast("Failed","error"); return; }
+    toast("Thank you for your feedback! 🌟","success");
+    document.getElementById("fb-name").value="";
+    document.getElementById("fb-message").value="";
+    loadFeedback();
+  });
+}
+function markFeedbackReviewed(feedbackId){
+  call("updateFeedbackStatus",{ feedbackId:feedbackId, status:"Reviewed" },function(err,res){
+    if(res&&res.success) loadFeedback();
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// TECHNO CLUB V4 — ROOM BOOKINGS FRONTEND
+// ─────────────────────────────────────────────────────
+var roomBookingsCache = [];
+var roomRateMap = { ALPHA:140, BETA:110, GAMMA:90, DELTA:60 };
+function todayInputValue(){ return new Date().toISOString().split("T")[0]; }
+function esc(v){ return String(v == null ? "" : v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+function fmtTimeOnly(v){ if(!v) return ""; var d = new Date(v); if(isNaN(d.getTime())) return ""; return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+function getDateOnly(v){ if(!v) return ""; return String(v).split("T")[0]; }
+function toDateTimeLocal(date){ var pad = function(n){ return String(n).padStart(2,"0"); }; return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate())+"T"+pad(date.getHours())+":"+pad(date.getMinutes()); }
+function openRoomBookingModal(){ var now=new Date(); now.setMinutes(0,0,0); var end=new Date(now.getTime()+3600000); document.getElementById("rb-customer").value=""; document.getElementById("rb-phone").value=""; document.getElementById("rb-room").value="ALPHA"; document.getElementById("rb-payment").value="Cash"; document.getElementById("rb-createdby").value="Staff"; document.getElementById("rb-start").value=toDateTimeLocal(now); document.getElementById("rb-end").value=toDateTimeLocal(end); document.getElementById("rb-discount-type").value="none"; document.getElementById("rb-discount-value").value="0"; document.getElementById("rb-discount-reason").value=""; document.getElementById("rb-notes").value=""; previewRoomBookingPrice(); openModal("roomBookingModal"); }
+function previewRoomBookingPrice(){ var room=document.getElementById("rb-room").value; var startVal=document.getElementById("rb-start").value; var endVal=document.getElementById("rb-end").value; var discountType=document.getElementById("rb-discount-type").value; var discountValue=parseFloat(document.getElementById("rb-discount-value").value)||0; var box=document.getElementById("rb-price-preview"); if(!startVal||!endVal){ box.innerHTML="Select start and end time to preview price."; return; } var start=new Date(startVal); var end=new Date(endVal); if(end<=start){ box.innerHTML='<span style="color:var(--danger);font-weight:700">End time must be after start time.</span>'; return; } var hours=Math.round(((end-start)/3600000)*100)/100; var rate=roomRateMap[room]||0; var subtotal=hours*rate; var discountAmount=0; if(discountType==="percentage"){ discountAmount=subtotal*Math.min(Math.max(discountValue,0),100)/100; } else if(discountType==="fixed"){ discountAmount=discountValue; } discountAmount=Math.max(0,Math.min(discountAmount,subtotal)); var total=subtotal-discountAmount; box.innerHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"><div><span style="color:var(--text2);font-size:.7rem">Hours</span><br/><strong>'+hours+'</strong></div><div><span style="color:var(--text2);font-size:.7rem">Rate</span><br/><strong>'+fmtEGP(rate)+'</strong></div><div><span style="color:var(--text2);font-size:.7rem">Discount</span><br/><strong style="color:var(--danger)">-'+fmtEGP(discountAmount)+'</strong></div><div><span style="color:var(--text2);font-size:.7rem">Total</span><br/><strong style="color:var(--accent)">'+fmtEGP(total)+'</strong></div></div>'; }
+function saveRoomBooking(){ var customerName=document.getElementById("rb-customer").value.trim(); var phone=document.getElementById("rb-phone").value.trim(); var room=document.getElementById("rb-room").value; var startTime=document.getElementById("rb-start").value; var endTime=document.getElementById("rb-end").value; if(!customerName){ toast("Customer name is required","error"); return; } if(!phone){ toast("Phone is required","error"); return; } if(!startTime||!endTime){ toast("Start and end time are required","error"); return; } var params={ customerName:customerName, phone:phone, room:room, startTime:startTime, endTime:endTime, paymentMethod:document.getElementById("rb-payment").value, discountType:document.getElementById("rb-discount-type").value, discountValue:document.getElementById("rb-discount-value").value, discountReason:document.getElementById("rb-discount-reason").value, createdBy:document.getElementById("rb-createdby").value||"Staff", notes:document.getElementById("rb-notes").value }; toast("Saving booking…","info"); call("createRoomBooking", params, function(err,res){ if(err||!res||!res.success){ toast("Booking failed: "+(res?res.error:err),"error"); return; } toast("Booking created — "+fmtEGP(res.finalAmount),"success"); closeModal("roomBookingModal"); loadRoomBookings(); loadRoomReports(); }); }
+function loadRoomBookings(){
+  var input = document.getElementById("rb-filter-date");
+
+  if (input && !input.value) {
+    input.value = todayInputValue();
+  }
+
+  call("getRoomBookings", {}, function(err, bookings){
+    if (err) {
+      toast("Failed to load bookings", "error");
+      return;
+    }
+
+    roomBookingsCache = bookings || [];
+
+    var dateFilter = input ? input.value : "";
+
+    if (dateFilter) {
+      roomBookingsCache = roomBookingsCache.filter(function(b){
+        var bookingDate = getDateOnly(b.StartTime || b.Date);
+        return bookingDate === dateFilter;
+      });
+    }
+
+    renderRoomBookings(roomBookingsCache);
+  });
+}
+function renderRoomBookings(bookings){
+  var tbody = document.getElementById("roomBookingsTableBody");
+
+  if (!tbody) return;
+
+  if (!bookings.length) {
+    tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><i class="fa fa-calendar-check"></i><p>No bookings</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = bookings.map(function(b){
+    var status = String(b.Status || "");
+    var statusClass = status === "Cancelled" ? "badge-red" : "badge-green";
+
+    // مهم: بنعرض التاريخ من StartTime لأنه هو التاريخ الحقيقي للحجز
+    var bookingDate = getDateOnly(b.StartTime || b.Date);
+
+    return '<tr>' +
+      '<td><code style="font-size:.68rem;color:var(--accent)">' + esc(b.BookingID) + '</code></td>' +
+      '<td><strong>' + esc(b.CustomerName) + '</strong></td>' +
+      '<td>' + esc(b.Phone) + '</td>' +
+      '<td><span class="badge-pill badge-mint">' + esc(b.Room) + '</span></td>' +
+      '<td>' + esc(bookingDate) + '</td>' +
+      '<td>' + fmtTimeOnly(b.StartTime) + ' - ' + fmtTimeOnly(b.EndTime) + '</td>' +
+      '<td>' + esc(b.Hours) + '</td>' +
+      '<td>' + fmtEGP(b.Subtotal) + '</td>' +
+      '<td><span style="color:var(--danger)">-' + fmtEGP(b.DiscountAmount) + '</span></td>' +
+      '<td><strong style="color:var(--accent)">' + fmtEGP(b.FinalAmount) + '</strong></td>' +
+      '<td><span class="badge-pill ' + statusClass + '">' + esc(status) + '</span></td>' +
+      '<td style="display:flex;gap:4px;flex-wrap:wrap">' +
+        '<button class="btn btn-success btn-xs" title="WhatsApp confirmation" onclick="openBookingWhatsapp(\'' + esc(b.BookingID) + '\',\'confirmation\')"><i class="fa-brands fa-whatsapp"></i></button>' +
+        '<button class="btn btn-outline btn-xs" title="WhatsApp reminder" onclick="openBookingWhatsapp(\'' + esc(b.BookingID) + '\',\'reminder\')"><i class="fa fa-bell"></i></button>' +
+        (status !== "Cancelled" ? '<button class="btn btn-danger btn-xs" title="Cancel" onclick="cancelBooking(\'' + esc(b.BookingID) + '\')"><i class="fa fa-trash"></i></button>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join("");
+}
+function cancelBooking(bookingId){ if(!confirm("Cancel this booking and delete its Calendar event?")) return; call("cancelRoomBooking",{bookingId:bookingId},function(err,res){ if(err||!res||!res.success){ toast("Cancel failed: "+(res?res.error:err),"error"); return; } toast("Booking cancelled","success"); loadRoomBookings(); loadRoomReports(); }); }
+function openBookingWhatsapp(bookingId,type){ call("getWhatsappLinkForBooking",{bookingId:bookingId,type:type},function(err,res){ if(err||!res||!res.success){ toast("WhatsApp link failed","error"); return; } window.open(res.url,"_blank"); }); }
+function loadRoomReports(){ var input=document.getElementById("rr-date"); if(input&&!input.value) input.value=todayInputValue(); call("getDailyRoomReport",{date:input?input.value:todayInputValue()},function(err,res){ if(err||!res||!res.success){ toast("Failed to load room report","error"); return; } renderRoomReport(res); }); }
+function renderRoomReport(report){ var s=report.summary||{}; document.getElementById("rr-total-bookings").textContent=s.totalBookings||0; document.getElementById("rr-total-hours").textContent=s.totalRoomHours||0; document.getElementById("rr-room-revenue").textContent=fmtEGP(s.totalRoomRevenue||0); document.getElementById("rr-discounts").textContent=fmtEGP(s.totalDiscounts||0); document.getElementById("rr-net-profit").textContent=fmtEGP(s.netProfit||0); var tbody=document.getElementById("roomReportTableBody"); var rooms=report.rooms||[]; if(!rooms.length){ tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><i class="fa fa-chart-column"></i><p>No report data</p></div></td></tr>'; return; } tbody.innerHTML=rooms.map(function(r){ var occ=parseFloat(r.occupancyRate)||0; var badge=occ>=70?"badge-green":(occ>=35?"badge-yellow":"badge-gray"); return '<tr><td><strong>'+esc(r.room)+'</strong></td><td>'+esc(r.capacity)+'</td><td>'+fmtEGP(r.hourlyRate)+'</td><td>'+esc(r.bookingsCount)+'</td><td>'+esc(r.bookedHours)+'</td><td><strong style="color:var(--accent)">'+fmtEGP(r.revenue)+'</strong></td><td><span style="color:var(--danger)">-'+fmtEGP(r.discounts)+'</span></td><td><span class="badge-pill '+badge+'">'+occ+'%</span></td></tr>'; }).join(""); }
+function loadFollowUps(){ call("getFollowUps",{},function(err,rows){ if(err){ toast("Failed to load follow-ups","error"); return; } renderFollowUps(rows||[]); }); }
+function renderFollowUps(rows){ var tbody=document.getElementById("followUpsTableBody"); if(!rows.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><i class="fa fa-phone-volume"></i><p>No follow-ups</p></div></td></tr>'; return; } tbody.innerHTML=rows.map(function(r){ var status=String(r.Status||""); var badge=status.indexOf("Lost")!==-1?"badge-red":status.indexOf("Needs")!==-1?"badge-yellow":"badge-blue"; return '<tr><td><strong>'+esc(r.CustomerName)+'</strong></td><td>'+esc(r.Phone)+'</td><td>'+esc(r.LastVisit)+'</td><td>'+esc(r.DaysAbsent)+'</td><td><span class="badge-pill '+badge+'">'+esc(status)+'</span></td><td style="font-size:.73rem">'+esc(r.Notes)+'</td></tr>'; }).join(""); }
+
+// ─────────────────────────────────────────────────────
+// DEMO DATA
+// ─────────────────────────────────────────────────────
+function runDemoData(){
+  if(!confirm("This will flush all data and load demo data. Continue?")) return;
+  toast("Loading demo data… please wait","info");
+  call("createDemoData",{},function(err,res){
+    if(err||!res||!res.success){ toast("Failed: "+(res?res.error:err),"error"); return; }
+    toast("Demo loaded! "+res.message,"success");
+    clientsCache=[]; expensesCache=[]; inflowsCache=[];
+    loadDashboard();
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────
+(function init(){
+  applyTranslations();
+  loadDashboard();
+})();
+</script>
+</body>
+</html>
